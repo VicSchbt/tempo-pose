@@ -1,16 +1,20 @@
-import { Button } from './components/ui/button';
+import Footer from './components/layout/Footer';
+import Header from './components/layout/Header';
+import Main from './components/layout/Main';
 
 export default function App() {
   return (
-    <main className="grid min-h-svh place-items-center">
-      <section className="flex flex-col items-center gap-4">
-        <h1 className="text-3xl font-semibold tracking-tight">Tempo Pose</h1>
-        <div className="flex items-center justify-center font-bold text-red-500">Hello world</div>
-        <p className="text-muted-foreground text-sm">
-          React + Vite + Tailwind + shadcn/ui is ready.
-        </p>
-        <Button onClick={() => alert('It works')}>Click me!</Button>
-      </section>
-    </main>
+    <div className="bg-background text-foreground flex min-h-svh flex-col">
+      <Header />
+      <Main>
+        <section className="space-y-4 text-center">
+          <h2 className="text-2xl font-semibold">Welcome to Gesture Drawing</h2>
+          <p className="text-muted-foreground mx-auto max-w-md">
+            Upload your reference images and start your timed sketch session.
+          </p>
+        </section>
+      </Main>
+      <Footer />
+    </div>
   );
 }
