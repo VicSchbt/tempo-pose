@@ -1,4 +1,4 @@
-// Pure helpers for ImageDrop — easy to unit-test, no React imports.
+// Pure helpers for ImageDrop — no React imports.
 
 /** Convert a FileList to a real array */
 export function fileListToArray(list: FileList | null): File[] {
@@ -28,10 +28,62 @@ export function makeAcceptPredicate(accept?: string) {
   };
 }
 
+/** Human readable file size */
+export function formatBytes(bytes: number) {
+  if (bytes === 0) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  const value = bytes / Math.pow(k, i);
+  return `${value >= 10 ? value.toFixed(0) : value.toFixed(1)} ${sizes[i]}`;
+}
+
+export type FileValidationIssue = {
+  file: File;
+  reason: 'type' | 'size';
+  message: string;
+};
+
+/**
+ * Validate files by accept predicate and max size.
+ * Returns { accepted, issues[] } where issues carries message per rejected file.
+ */
+export function validateFiles(
+  files: File[],
+  opts: {
+    acceptPredicate: (f: File) => boolean;
+    maxBytes: number;
+  },
+) {
+  const accepted: File[] = [];
+  const issues: FileValidationIssue[] = [];
+
+  for (const f of files) {
+    if (!opts.acceptPredicate(f) || !f.type.startsWith('image/')) {
+      issues.push({
+        file: f,
+        reason: 'type',
+        message: `${f.name} is not a supported image type.`,
+      });
+      continue;
+    }
+    if (f.size > opts.maxBytes) {
+      issues.push({
+        file: f,
+        reason: 'size',
+        message: `${f.name} is too large (${formatBytes(f.size)}).`,
+      });
+      continue;
+    }
+    accepted.push(f);
+  }
+
+  return { accepted, issues };
+}
+
 /**
  * Normalize image files into your app’s image model:
  * { id, url, name } — URL is created via createObjectURL.
- * The `idFactory` allows deterministic testing or swapping nanoid.
  */
 export function normalizeImages(
   files: File[],
