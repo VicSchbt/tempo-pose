@@ -1,5 +1,7 @@
 // Pure helpers for ImageDrop — no React imports.
 
+import type { ImageItem } from '@/types/core';
+
 /** Convert a FileList to a real array */
 export function fileListToArray(list: FileList | null): File[] {
   return list ? Array.from(list) : [];
@@ -85,16 +87,18 @@ export function validateFiles(
  * Normalize image files into your app’s image model:
  * { id, url, name } — URL is created via createObjectURL.
  */
+
 export function normalizeImages(
   files: File[],
   acceptPredicate: (f: File) => boolean,
   idFactory: () => string,
-) {
+): ImageItem[] {
   return files
     .filter((f) => f.type.startsWith('image/') && acceptPredicate(f))
     .map((f) => ({
       id: idFactory(),
-      url: URL.createObjectURL(f),
       name: f.name,
+      url: URL.createObjectURL(f),
+      file: f,
     }));
 }
