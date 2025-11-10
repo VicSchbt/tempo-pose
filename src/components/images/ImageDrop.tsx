@@ -2,6 +2,7 @@ import { useStore } from '@/store';
 import { nanoid } from 'nanoid';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { fileListToArray, makeAcceptPredicate, normalizeImages } from './ImageDrop.utils';
+import { Upload } from 'lucide-react';
 
 type ImageDropProps = {
   /** Accept list for the file dialog & drag filter */
@@ -112,23 +113,51 @@ export default function ImageDrop({
         onDragLeave={onDragLeave}
         onDrop={onDrop}
         className={[
-          // base
-          'rounded-2xl border border-dashed p-6 text-center transition-colors',
+          // size & layout
+          'mx-auto flex h-64 w-full max-w-3xl flex-col items-center justify-center p-4 sm:h-72',
+          // visuals
+          'rounded-3xl border-2 border-dashed bg-neutral-50',
+          'shadow-sm transition-all duration-300',
+          // focus
           'focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none',
-          // state
+          // states
           disabled
             ? 'cursor-not-allowed border-neutral-300 opacity-60'
             : isDragging
-              ? 'border-blue-500 ring-2 ring-blue-500/30'
-              : 'border-neutral-300 hover:border-neutral-400',
+              ? 'border-blue-400 bg-blue-50/50 ring-2 ring-blue-500/30'
+              : 'hover:border-neutral-400',
+          // dark mode (if you enable it later)
+          'dark:border-neutral-700 dark:from-neutral-900 dark:to-neutral-900/80 dark:text-neutral-100 dark:hover:border-neutral-500',
           className,
         ].join(' ')}
       >
-        <p className="text-base font-medium">{label}</p>
-        <p id={`${id}-hint`} className="text-muted-foreground mt-2 text-sm">
+        <Upload
+          aria-hidden="true"
+          className={[
+            'mb-3 h-12 w-12 transition-transform',
+            isDragging ? 'scale-110 text-blue-500' : 'text-neutral-400',
+          ].join(' ')}
+        />
+        <p className="text-xl font-semibold text-neutral-800 dark:text-neutral-100">{label}</p>
+        <p id={`${id}-hint`} className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
           {multiple ? 'Multiple files • ' : ''}
           Accepted: <code>{accept}</code>
         </p>
+
+        {/* subtle dotted background for a playful feel */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 rounded-3xl"
+          style={{
+            maskImage: 'radial-gradient(12px 12px at 12px 12px, transparent 10px, black 10px)',
+            WebkitMaskImage:
+              'radial-gradient(12px 12px at 12px 12px, transparent 10px, black 10px)',
+            backgroundImage: 'radial-gradient(currentColor 1px, transparent 1px)',
+            backgroundSize: '16px 16px',
+            opacity: isDragging ? 0.12 : 0.06,
+            color: 'rgb(59 130 246)', // tailwind blue-500; only affects decorative dots
+          }}
+        />
 
         {/* Live region for drag state (a11y) */}
         <span className="sr-only" aria-live="polite">
