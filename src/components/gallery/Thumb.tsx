@@ -1,6 +1,7 @@
 import React from 'react';
 import { X } from 'lucide-react';
 import type { ImageItem } from '@/types/core';
+import { Button } from '../ui/button';
 
 type ThumbProps = {
   img: ImageItem;
@@ -32,14 +33,16 @@ export const Thumb = React.memo(function Thumb({ img, onRemove }: ThumbProps) {
 
       {/* remove button */}
       {onRemove && (
-        <button
+        <Button
+          className="absolute top-2 right-2 rounded-full"
           type="button"
           onClick={() => onRemove(img.id)}
-          className="absolute top-2 right-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-neutral-700 opacity-0 shadow-sm ring-1 ring-neutral-200 transition-opacity group-hover:opacity-100 hover:bg-white focus:opacity-100"
           aria-label={`Remove ${label}`}
+          variant="outline"
+          size="icon"
         >
           <X className="h-4 w-4" aria-hidden />
-        </button>
+        </Button>
       )}
     </li>
   );

@@ -1,5 +1,8 @@
 import { useStore } from '@/store';
 import { Thumb } from './Thumb';
+import { useRef, useState } from 'react';
+import { Button } from '../ui/button';
+import { ConfirmDialog } from '../dialog/ConfirmDialog';
 
 /**
  * Renders a responsive grid of image thumbnails from global state.
@@ -11,6 +14,9 @@ export default function ImageGrid() {
   const images = useStore((s) => s.images); // REQUIRED in your store
   const removeImage = useStore((s) => s.removeImage as (id: string) => void); // OPTIONAL
   const clearImages = useStore((s) => s.clearImages as () => void); // OPTIONAL
+
+  const [open, setOpen] = useState(false);
+  const clearBtnRef = useRef<HTMLButtonElement>(null);
 
   if (!images || images.length === 0) {
     return (
@@ -32,13 +38,23 @@ export default function ImageGrid() {
         </h2>
 
         {typeof clearImages === 'function' && (
-          <button
-            type="button"
-            onClick={() => clearImages()}
-            className="rounded-lg border px-3 py-1.5 text-sm font-medium text-neutral-700 shadow-sm hover:bg-neutral-50 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
-          >
-            Clear all
-          </button>
+          <>
+            <Button ref={clearBtnRef} variant="outline" onClick={() => setOpen(true)}>
+              Clear all
+            </Button>
+
+            <ConfirmDialog
+              open={open}
+              onOpenChange={setOpen}
+              title="Clear all images?"
+              description="This will permanently remove all thumbnails from the gallery."
+              confirmLabel="Yes, clear all"
+              cancelLabel="Cancel"
+              tone="danger"
+              onConfirm={() => clearImages()}
+              returnFocus={() => clearBtnRef.current?.focus()}
+            />
+          </>
         )}
       </header>
 
