@@ -6,6 +6,7 @@ import ImageDrop from '@/components/images/ImageDrop';
 import TimerControls from '@/components/timer/TimerControls';
 import SessionControls from '@/components/session/SessionControls';
 import CurrentImage from '@/components/session/CurrentImage';
+import ImageGrid from './components/gallery/ImageGrid';
 
 export default function App() {
   const imagesCount = useStore((s) => s.images.length);
@@ -20,7 +21,8 @@ export default function App() {
             <span className="text-muted-foreground text-sm">{imagesCount} images loaded</span>
           </div>
 
-          <ImageDrop />
+          <ImageDrop className="mt-6" />
+          <ImageGrid />
 
           <div className="flex items-center gap-4">
             <TimerControls />
