@@ -6,9 +6,16 @@ import { Button } from '../ui/button';
 type ThumbProps = {
   img: ImageItem;
   onRemove?: (id: string) => void;
+  overlayLabel?: string;
+  overlayAction?: () => void;
 };
 
-export const Thumb = React.memo(function Thumb({ img, onRemove }: ThumbProps) {
+export const Thumb = React.memo(function Thumb({
+  img,
+  onRemove,
+  overlayLabel,
+  overlayAction,
+}: ThumbProps) {
   const src = img.url;
   const label = img.name ?? 'Image';
 
@@ -30,6 +37,20 @@ export const Thumb = React.memo(function Thumb({ img, onRemove }: ThumbProps) {
       <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-center gap-2 bg-gradient-to-t from-black/60 to-transparent p-2">
         <p className="line-clamp-1 text-xs text-white/95">{label}</p>
       </div>
+
+      {/* "+X more" overlay button */}
+      {overlayLabel && overlayAction && (
+        <button
+          type="button"
+          aria-label={`${overlayLabel} – show all thumbnails`}
+          onClick={overlayAction}
+          className="absolute inset-0 inline-flex items-center justify-center bg-black/45 text-white backdrop-blur-[1px] transition-colors hover:bg-black/55 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+        >
+          <span className="rounded-full bg-white/90 px-3 py-1 text-sm font-semibold text-neutral-900 shadow">
+            {overlayLabel}
+          </span>
+        </button>
+      )}
 
       {/* remove button */}
       {onRemove && (
