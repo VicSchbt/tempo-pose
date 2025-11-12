@@ -7,6 +7,7 @@ import TimerControls from '@/components/timer/TimerControls';
 import SessionControls from '@/components/session/SessionControls';
 import CurrentImage from '@/components/session/CurrentImage';
 import ImageGrid from './components/gallery/ImageGrid';
+import { Toaster } from 'sonner';
 
 export default function App() {
   const imagesCount = useStore((s) => s.images.length);
@@ -33,6 +34,7 @@ export default function App() {
         </section>
       </Main>
       <Footer />
+      <Toaster richColors closeButton position="top-right" />
     </div>
   );
 }
