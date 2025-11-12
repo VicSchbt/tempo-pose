@@ -1,11 +1,12 @@
 import { useStore } from '@/store';
 import { Thumb } from './Thumb';
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Button } from '../ui/button';
 import { ConfirmDialog } from '../dialog/ConfirmDialog';
 import { useResponsiveColumns } from '@/hooks/useResponsiveColumns';
 import { ChevronUp } from 'lucide-react';
 import { CountBadge } from '../count-badge/CountBadge';
+import { useImagePrefetch } from '@/hooks/useImagePrefetch';
 
 /**
  * Collapsible first row:
@@ -42,6 +43,14 @@ export default function ImageGrid() {
   const remaining = Math.max(0, total - visibleWhenCollapsed);
 
   const visible = expanded || !canCollapse ? images : images.slice(0, visibleWhenCollapsed);
+
+  const toPrefetch = useMemo(() => {
+    if (!canCollapse || expanded) return [];
+    // prefetch the first chunk of hidden images to keep it light
+    return images.slice(visibleWhenCollapsed, visibleWhenCollapsed + 10).map((i) => i.url);
+  }, [images, canCollapse, expanded, visibleWhenCollapsed]);
+
+  useImagePrefetch(toPrefetch, { concurrency: 2, limit: 10 });
 
   return (
     <section className="mx-auto mt-6 w-full max-w-5xl">
