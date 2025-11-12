@@ -1,6 +1,6 @@
 import { useStore } from '@/store';
 import { nanoid } from 'nanoid';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import {
   fileListToArray,
   formatBytes,
@@ -11,6 +11,7 @@ import {
 import { DropSurface } from './DropSurface';
 import { useDragDrop } from './useDragDrop';
 import { toast } from 'sonner';
+import { dedupeFiles } from '@/utils/fileDedup';
 
 type ImageDropProps = {
   accept?: string; // e.g. "image/*,.png,.jpg,.jpeg,.webp"
@@ -42,7 +43,20 @@ export default function ImageDrop({
   // Unified “process files” function (used by both DnD and input)
   const process = useCallback(
     (files: File[]) => {
-      const { accepted, issues } = validateFiles(files, {
+      // 🧩 1. Deduplicate
+      const uniqueFiles = dedupeFiles(files);
+      const duplicatesCount = files.length - uniqueFiles.length;
+
+      // 🧩 2. Warn user if any duplicate found
+      if (duplicatesCount > 0) {
+        toast.info(`${duplicatesCount} duplicate file${duplicatesCount > 1 ? 's' : ''} ignored`, {
+          duration: 4000,
+          position: 'top-right',
+        });
+      }
+
+      // 🧩 3. Continue with your existing validation
+      const { accepted, issues } = validateFiles(uniqueFiles, {
         acceptPredicate,
         maxBytes,
       });
@@ -51,14 +65,11 @@ export default function ImageDrop({
         const messages = [
           ...new Set(
             issues.map((i) =>
-              i.reason === 'size'
-                ? `${i.message} Max allowed is ${formatBytes(maxBytes)}.`
-                : i.message,
+              i.reason === 'size' ? `${i.message} (max ${formatBytes(maxBytes)})` : i.message,
             ),
           ),
         ];
 
-        // One toast per error message
         messages.slice(0, 5).forEach((msg) => {
           toast.error(msg, {
             duration: 5000,
@@ -66,13 +77,13 @@ export default function ImageDrop({
           });
         });
 
-        // If there are more, one summary toast
         if (messages.length > 5) {
           toast.error(`+${messages.length - 5} more issues`, {
             duration: 4000,
             position: 'top-right',
           });
         }
+
         onValidationIssues?.(messages);
       }
 
