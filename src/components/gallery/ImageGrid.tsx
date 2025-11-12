@@ -5,6 +5,7 @@ import { Button } from '../ui/button';
 import { ConfirmDialog } from '../dialog/ConfirmDialog';
 import { useResponsiveColumns } from '@/hooks/useResponsiveColumns';
 import { ChevronUp } from 'lucide-react';
+import { CountBadge } from '../count-badge/CountBadge';
 
 /**
  * Collapsible first row:
@@ -45,9 +46,16 @@ export default function ImageGrid() {
   return (
     <section className="mx-auto mt-6 w-full max-w-5xl">
       <header className="mb-3 flex items-center justify-between gap-2">
-        <h2 className="text-lg font-semibold text-neutral-900">
-          Gallery <span className="text-neutral-500">({images.length})</span>
-        </h2>
+        <div className="flex items-center gap-2">
+          <h2 className="text-lg font-semibold text-neutral-900">Gallery</h2>
+          {/* Total images */}
+          <CountBadge
+            count={total}
+            ariaLabel={`Total images: ${total}`}
+            title={`${total} image${total > 1 ? 's' : ''}`}
+            variant="secondary"
+          />
+        </div>
 
         {typeof clearImages === 'function' && (
           <>
