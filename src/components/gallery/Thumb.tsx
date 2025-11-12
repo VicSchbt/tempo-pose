@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { X } from 'lucide-react';
 import type { ImageItem } from '@/types/core';
 import { Button } from '../ui/button';
+import { getPreviewURL, revokePreviewURL } from '@/utils/imagePreview';
 
 type ThumbProps = {
   img: ImageItem;
@@ -16,8 +17,41 @@ export const Thumb = React.memo(function Thumb({
   overlayLabel,
   overlayAction,
 }: ThumbProps) {
-  const src = img.url;
   const label = img.name ?? 'Image';
+  const [previewSrc, setPreviewSrc] = useState<string | null>(null);
+
+  const previewKey = useMemo(() => `${img.id}:${img.url}`, [img.id, img.url]);
+
+  useEffect(() => {
+    let cancelled = false;
+    let createdUrl: string | null = null;
+
+    (async () => {
+      try {
+        const url = await getPreviewURL(
+          { file: (img as any).file, url: img.url },
+          { maxSize: 512, quality: 0.6 },
+        );
+        if (!cancelled) {
+          setPreviewSrc(url);
+          createdUrl = url;
+        }
+      } catch {
+        // if preview fails, fall back to original
+        if (!cancelled) setPreviewSrc(img.url);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+      if (createdUrl && createdUrl !== img.url) {
+        revokePreviewURL(createdUrl);
+      }
+    };
+    // re-run only if the image changes
+  }, [previewKey]);
+
+  const src = previewSrc ?? img.url;
 
   return (
     <li
