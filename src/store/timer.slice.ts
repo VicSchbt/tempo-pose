@@ -1,6 +1,10 @@
 import type { StateCreator } from 'zustand';
 
 export type TimerPreset = 15 | 30 | 60 | 90 | 120 | 300; // seconds (example)
+
+// Choose a nice default preset (in seconds)
+const DEFAULT_PRESET: TimerPreset = 60;
+
 export type TimerState = {
   // configuration
   preset: TimerPreset | null;
@@ -25,7 +29,7 @@ export const createTimerSlice: StateCreator<
   [],
   TimerState
 > = (set, get) => ({
-  preset: 60,
+  preset: DEFAULT_PRESET,
   customSeconds: null,
 
   isRunning: false,
@@ -85,4 +89,10 @@ export const createTimerSlice: StateCreator<
       false,
       'timer/reset',
     ),
+
+  getDurationMs: () => {
+    const { preset, customSeconds } = get();
+    const seconds = preset ?? customSeconds ?? DEFAULT_PRESET;
+    return seconds * 1000;
+  },
 });
