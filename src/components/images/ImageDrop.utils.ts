@@ -100,5 +100,6 @@ export function normalizeImages(
       name: f.name,
       url: URL.createObjectURL(f),
       file: f,
+      status: 'ok',
     }));
 }

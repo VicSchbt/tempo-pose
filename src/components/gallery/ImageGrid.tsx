@@ -18,6 +18,7 @@ export default function ImageGrid() {
   const images = useStore((s) => s.images); // REQUIRED in your store
   const removeImage = useStore((s) => s.removeImage as (id: string) => void); // OPTIONAL
   const clearImages = useStore((s) => s.clearImages as () => void); // OPTIONAL
+  const markImageBroken = useStore((s) => s.markImageBroken as (id: string) => void);
 
   const cols = useResponsiveColumns();
   const [expanded, setExpanded] = useState(false);
@@ -101,6 +102,7 @@ export default function ImageGrid() {
               onRemove={typeof removeImage === 'function' ? removeImage : undefined}
               overlayLabel={isLastVisibleAndCollapsed ? `+${remaining} more` : undefined}
               overlayAction={isLastVisibleAndCollapsed ? () => setExpanded(true) : undefined}
+              onBroken={(id) => markImageBroken(id)}
             />
           );
         })}

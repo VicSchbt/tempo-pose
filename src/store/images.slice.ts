@@ -3,8 +3,11 @@ import type { StateCreator } from 'zustand';
 
 export type ImagesSlice = {
   images: ImageItem[];
+  validImages: () => ImageItem[];
+
   addImages: (items: ImageItem[]) => void;
   removeImage: (id: string) => void;
+  markImageBroken: (id: string) => void;
   clearImages: () => void;
 };
 
@@ -39,6 +42,11 @@ export const createImagesSlice: StateCreator<
       'images/removeImage',
     ),
 
+  markImageBroken: (id) =>
+    set((state) => ({
+      images: state.images.map((img) => (img.id === id ? { ...img, status: 'broken' } : img)),
+    })),
+
   clearImages: () =>
     set(
       (state) => {
@@ -48,4 +56,8 @@ export const createImagesSlice: StateCreator<
       false,
       'images/clearImages',
     ),
+
+  validImages() {
+    return this.images.filter((img) => img.status === 'ok');
+  },
 });
