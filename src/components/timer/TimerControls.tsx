@@ -4,6 +4,7 @@ import type { TimerPresetId } from '@/types/core';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
+import { TimerHelpTooltip } from './TimerHelpTooltip';
 
 const PRESETS: { id: TimerPresetId; label: string; seconds: TimerPreset | null }[] = [
   { id: '30s', label: '30s', seconds: 30 },
@@ -52,7 +53,17 @@ export default function TimerControls() {
   };
 
   return (
-    <section aria-label="Timer controls" className="flex flex-col gap-3">
+    <section aria-label="Timer controls" className="flex w-full flex-col gap-3">
+      <header className="flex items-center justify-between gap-2">
+        <div className="flex flex-col gap-1">
+          <h2 id="timer-section-title" className="text-xl font-semibold">
+            Timer
+          </h2>
+        </div>
+
+        {/* Tooltip with “image advances every X seconds” */}
+        <TimerHelpTooltip />
+      </header>
       <div
         role="radiogroup"
         aria-label="Timer presets"
