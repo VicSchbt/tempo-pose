@@ -5,6 +5,20 @@ export type TimerPreset = 15 | 30 | 60 | 90 | 120 | 300; // seconds (example)
 // Choose a nice default preset (in seconds)
 const DEFAULT_PRESET: TimerPreset = 60;
 
+/**
+ * Pure helper: map (preset, customSeconds) → duration in ms.
+ * - If preset is set, it wins.
+ * - Else we use customSeconds if present.
+ * - Else we fall back to DEFAULT_PRESET.
+ */
+export function getDurationMsFromConfig(
+  preset: TimerPreset | null,
+  customSeconds: number | null,
+): number {
+  const seconds = preset ?? customSeconds ?? DEFAULT_PRESET;
+  return seconds * 1000;
+}
+
 export type TimerState = {
   // configuration
   preset: TimerPreset | null;
@@ -92,7 +106,6 @@ export const createTimerSlice: StateCreator<
 
   getDurationMs: () => {
     const { preset, customSeconds } = get();
-    const seconds = preset ?? customSeconds ?? DEFAULT_PRESET;
-    return seconds * 1000;
+    return getDurationMsFromConfig(preset, customSeconds);
   },
 });
