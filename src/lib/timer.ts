@@ -38,3 +38,50 @@ export function resolveTimerDurationMs(
 ): number {
   return resolveTimerSeconds(preset, customSeconds) * 1000;
 }
+
+/**
+ * Converts seconds to mm:ss format
+ * @param totalSeconds - Total seconds to format
+ * @returns Formatted time string (e.g., "4:30" for 270 seconds)
+ */
+export function formatTimeFromSeconds(totalSeconds: number): string {
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+}
+
+/**
+ * Parses mm:ss format to total seconds
+ * @param timeString - Time string in mm:ss format (e.g., "4:30", "0:30")
+ * @returns Total seconds, or null if invalid format
+ */
+export function parseTimeToSeconds(timeString: string): number | null {
+  const trimmed = timeString.trim();
+
+  // Allow empty string
+  if (trimmed === '') {
+    return null;
+  }
+
+  // Match format: optional minutes, colon, seconds (e.g., "4:30", "04:30", "0:30")
+  const match = trimmed.match(/^(\d+):(\d{1,2})$/);
+  if (!match) {
+    return null;
+  }
+
+  const minutes = parseInt(match[1], 10);
+  const seconds = parseInt(match[2], 10);
+
+  // Validate seconds are 0-59
+  if (seconds < 0 || seconds > 59) {
+    return null;
+  }
+
+  // Validate minutes are non-negative
+  if (minutes < 0) {
+    return null;
+  }
+
+  const totalSeconds = minutes * 60 + seconds;
+  return totalSeconds;
+}
