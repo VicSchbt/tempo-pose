@@ -40,9 +40,6 @@ export function ConfirmDialog({
   onOpenChange,
   returnFocus,
 }: ConfirmDialogProps) {
-  const confirmBtnClass =
-    tone === 'danger' ? 'bg-red-600 hover:bg-red-700 focus-visible:ring-red-600 text-white' : '';
-
   // Restore focus to trigger after closing
   React.useEffect(() => {
     if (!open) returnFocus?.();
@@ -55,7 +52,9 @@ export function ConfirmDialog({
           <div className="flex items-center gap-2">
             <AlertTriangle
               aria-hidden
-              className={tone === 'danger' ? 'h-5 w-5 text-red-600' : 'h-5 w-5 text-neutral-600'}
+              className={
+                tone === 'danger' ? 'text-destructive h-5 w-5' : 'text-muted-foreground h-5 w-5'
+              }
             />
             <DialogTitle className="leading-none">{title}</DialogTitle>
           </div>
@@ -68,7 +67,7 @@ export function ConfirmDialog({
           </DialogClose>
 
           <Button
-            className={confirmBtnClass}
+            variant={tone === 'danger' ? 'destructive' : 'default'}
             onClick={() => {
               onConfirm();
               onOpenChange(false);
