@@ -26,6 +26,23 @@ export default function ImageGrid() {
   const [open, setOpen] = useState(false);
   const clearBtnRef = useRef<HTMLButtonElement>(null);
 
+  // Calculate values before conditional return to ensure hooks are always called
+  const total = images?.length ?? 0;
+  const canCollapse = total > cols; // only if we overflow the first row
+  const visibleWhenCollapsed = Math.max(0, cols); // we keep exactly one row
+  const remaining = Math.max(0, total - visibleWhenCollapsed);
+
+  const visible = expanded || !canCollapse ? images ?? [] : (images ?? []).slice(0, visibleWhenCollapsed);
+
+  const toPrefetch = useMemo(() => {
+    if (!canCollapse || expanded || !images) return [];
+    // prefetch the first chunk of hidden images to keep it light
+    return images.slice(visibleWhenCollapsed, visibleWhenCollapsed + 10).map((i) => i.url);
+  }, [images, canCollapse, expanded, visibleWhenCollapsed]);
+
+  useImagePrefetch(toPrefetch, { concurrency: 2, limit: 10 });
+
+  // Early return AFTER all hooks have been called
   if (!images || images.length === 0) {
     return (
       <div
@@ -37,21 +54,6 @@ export default function ImageGrid() {
       </div>
     );
   }
-
-  const total = images.length;
-  const canCollapse = total > cols; // only if we overflow the first row
-  const visibleWhenCollapsed = Math.max(0, cols); // we keep exactly one row
-  const remaining = Math.max(0, total - visibleWhenCollapsed);
-
-  const visible = expanded || !canCollapse ? images : images.slice(0, visibleWhenCollapsed);
-
-  const toPrefetch = useMemo(() => {
-    if (!canCollapse || expanded) return [];
-    // prefetch the first chunk of hidden images to keep it light
-    return images.slice(visibleWhenCollapsed, visibleWhenCollapsed + 10).map((i) => i.url);
-  }, [images, canCollapse, expanded, visibleWhenCollapsed]);
-
-  useImagePrefetch(toPrefetch, { concurrency: 2, limit: 10 });
 
   return (
     <section className="mx-auto mt-6 w-full max-w-5xl">

@@ -39,7 +39,7 @@ export const Thumb = React.memo(function Thumb({
     (async () => {
       try {
         const url = await getPreviewURL(
-          { file: (img as any).file, url: img.url },
+          { file: img.file, url: img.url },
           { maxSize: 512, quality: 0.6 },
         );
         if (!cancelled) {

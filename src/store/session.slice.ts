@@ -1,73 +1,75 @@
 import type { ImageItem } from '@/types/core';
 import type { StateCreator } from 'zustand';
+import { shuffleArray } from '@/lib/shuffle';
 
 export type SessionState = {
-  order: string[]; // queue of image IDs for the current session
-  currentIndex: number; // pointer into 'order'
+  sessionQueue: string[]; // queue of image IDs for the current session (TEMPO-34)
+  ptr: number; // pointer into 'sessionQueue' (TEMPO-36)
   isActive: boolean;
 
   // settings
   avoidRepeatUntilExhausted: boolean;
 
   // actions
-  initFromImages: (images: ImageItem[], shuffle: boolean) => void;
+  startSession: (images: ImageItem[]) => boolean; // returns true if session started, false if empty (TEMPO-35)
   next: () => void;
   prev: () => void;
   stopSession: () => void;
   setAvoidRepeat: (v: boolean) => void;
 };
 
-function shuffle<T>(arr: T[]) {
-  const a = arr.slice();
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
 export const createSessionSlice: StateCreator<
   SessionState,
   [['zustand/devtools', never], ['zustand/persist', unknown]],
   [],
   SessionState
-> = (set, get) => ({
-  order: [],
-  currentIndex: 0,
+> = (set) => ({
+  sessionQueue: [],
+  ptr: 0,
   isActive: false,
   avoidRepeatUntilExhausted: true,
 
-  initFromImages: (images, doShuffle) =>
+  // TEMPO-35: On Start: derive queue from current images; guard empty state
+  startSession: (images) => {
+    const validImages = images.filter((img) => img.status === 'ok');
+
+    if (validImages.length === 0) {
+      return false; // Guard empty state
+    }
+
+    // TEMPO-34: Implement Fisher-Yates shuffle → sessionQueue (array of ids)
+    const ids = validImages.map((i) => i.id);
+    const shuffledQueue = shuffleArray(ids);
+
     set(
-      () => {
-        const ids = images.map((i) => i.id);
-        const base = doShuffle ? shuffle(ids) : ids;
-        return {
-          order: base,
-          currentIndex: 0,
-          isActive: base.length > 0,
-        };
+      {
+        sessionQueue: shuffledQueue,
+        ptr: 0,
+        isActive: true,
       },
       false,
-      'session/initFromImages',
-    ),
+      'session/startSession',
+    );
+
+    return true;
+  },
 
   next: () =>
     set(
       (state) => {
-        if (!state.isActive || state.order.length === 0) return state;
+        if (!state.isActive || state.sessionQueue.length === 0) return state;
 
-        let idx = state.currentIndex + 1;
+        let idx = state.ptr + 1;
 
-        if (idx >= state.order.length) {
+        if (idx >= state.sessionQueue.length) {
           // Exhausted once — either wrap or reshuffle to avoid immediate repeats
           if (state.avoidRepeatUntilExhausted) {
-            const reshuffled = shuffle(state.order);
-            return { order: reshuffled, currentIndex: 0 };
+            const reshuffled = shuffleArray(state.sessionQueue);
+            return { sessionQueue: reshuffled, ptr: 0 };
           }
           idx = 0; // simple wrap
         }
-        return { currentIndex: idx };
+        return { ptr: idx };
       },
       false,
       'session/next',
@@ -76,15 +78,15 @@ export const createSessionSlice: StateCreator<
   prev: () =>
     set(
       (state) => {
-        if (!state.isActive || state.order.length === 0) return state;
-        const idx = (state.currentIndex - 1 + state.order.length) % state.order.length;
-        return { currentIndex: idx };
+        if (!state.isActive || state.sessionQueue.length === 0) return state;
+        const idx = (state.ptr - 1 + state.sessionQueue.length) % state.sessionQueue.length;
+        return { ptr: idx };
       },
       false,
       'session/prev',
     ),
 
-  stopSession: () => set({ isActive: false, order: [], currentIndex: 0 }, false, 'session/stop'),
+  stopSession: () => set({ isActive: false, sessionQueue: [], ptr: 0 }, false, 'session/stop'),
 
   setAvoidRepeat: (v) => set({ avoidRepeatUntilExhausted: v }, false, 'session/setAvoidRepeat'),
 });

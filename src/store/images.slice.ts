@@ -16,15 +16,18 @@ export const createImagesSlice: StateCreator<
   [['zustand/devtools', never], ['zustand/persist', unknown]],
   [],
   ImagesSlice
-> = (set, get) => ({
+> = (set) => ({
   images: [],
 
   addImages: (items) =>
     set(
       (state) => {
         // Optional dedupe by name+size; adapt if you store hashes later
-        const existing = new Set(state.images.map((i) => `${i.name}|${i.file.size}`));
-        const toAdd = items.filter((i) => !existing.has(`${i.name}|${i.file.size}`));
+        // Guard against missing file property (shouldn't happen, but be safe)
+        const existing = new Set(
+          state.images.filter((i) => i.file).map((i) => `${i.name}|${i.file.size}`),
+        );
+        const toAdd = items.filter((i) => i.file && !existing.has(`${i.name}|${i.file.size}`));
         return { images: [...state.images, ...toAdd] };
       },
       false,

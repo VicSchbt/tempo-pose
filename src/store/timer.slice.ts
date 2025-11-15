@@ -51,9 +51,10 @@ export const createTimerSlice: StateCreator<
 
   setPreset: (p) =>
     set(
-      () => ({
+      (state) => ({
         preset: p,
-        customSeconds: null,
+        // Preserve customSeconds so it persists when switching back to custom mode
+        customSeconds: state.customSeconds,
         remaining: p ?? 0,
       }),
       false,
