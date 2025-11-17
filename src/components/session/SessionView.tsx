@@ -4,6 +4,11 @@ import Footer from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { formatTimeFromSeconds } from '@/lib/timer';
 import type { ImageItem } from '@/types/core';
+import {
+  type ShortcutBinding,
+  handleKeyboardShortcut,
+  isButtonLikeElement,
+} from '@/utils/keyboardShortcuts';
 
 type SessionViewProps = {
   currentImage: ImageItem;
@@ -19,33 +24,6 @@ type SessionViewProps = {
   onResume: () => void;
   onEndSession: () => void;
   hasMultipleImages: boolean;
-};
-
-const isEditableElement = (element: HTMLElement | null) => {
-  if (!element) {
-    return false;
-  }
-
-  const tag = element.tagName;
-  return (
-    tag === 'INPUT' ||
-    tag === 'TEXTAREA' ||
-    tag === 'SELECT' ||
-    element.isContentEditable
-  );
-};
-
-const isButtonLikeElement = (element: HTMLElement | null) => {
-  if (!element) {
-    return false;
-  }
-
-  if (element.tagName === 'BUTTON') {
-    return true;
-  }
-
-  const role = element.getAttribute('role');
-  return role === 'button';
 };
 
 export default function SessionView({
@@ -104,15 +82,12 @@ export default function SessionView({
     setHasFocusWithin(true);
   }, []);
 
-  const handleBlurCapture = useCallback(
-    (event: FocusEvent<HTMLDivElement>) => {
-      const nextTarget = event.relatedTarget as HTMLElement | null;
-      if (!rootRef.current?.contains(nextTarget)) {
-        setHasFocusWithin(false);
-      }
-    },
-    [],
-  );
+  const handleBlurCapture = useCallback((event: FocusEvent<HTMLDivElement>) => {
+    const nextTarget = event.relatedTarget as HTMLElement | null;
+    if (!rootRef.current?.contains(nextTarget)) {
+      setHasFocusWithin(false);
+    }
+  }, []);
 
   const handleTogglePause = useCallback(() => {
     if (isPaused) {
@@ -121,6 +96,50 @@ export default function SessionView({
     }
     onPause();
   }, [isPaused, onPause, onResume]);
+
+  const codeShortcutMap = useMemo<Map<string, ShortcutBinding>>(
+    () =>
+      new Map([
+        [
+          'Space',
+          {
+            action: handleTogglePause,
+            preventDefault: true,
+            shouldIgnoreTarget: (target) =>
+              isButtonLikeElement(target) && target?.dataset.sessionShortcut !== 'pause',
+          },
+        ],
+      ]),
+    [handleTogglePause],
+  );
+
+  const keyShortcutMap = useMemo<Map<string, ShortcutBinding>>(
+    () =>
+      new Map([
+        [
+          'n',
+          {
+            action: onNext,
+            preventDefault: true,
+          },
+        ],
+        [
+          'p',
+          {
+            action: onPrev,
+            preventDefault: true,
+          },
+        ],
+        [
+          'f',
+          {
+            action: toggleFullscreen,
+            preventDefault: true,
+          },
+        ],
+      ]),
+    [onNext, onPrev, toggleFullscreen],
+  );
 
   useEffect(() => {
     const node = rootRef.current;
@@ -176,48 +195,14 @@ export default function SessionView({
     }
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      const target = event.target as HTMLElement | null;
-
-      if (isEditableElement(target)) {
-        return;
-      }
-
-      const key = event.key.toLowerCase();
-      const code = event.code;
-
-      if (code === 'Space') {
-        const allowsSpaceOverride = target?.dataset.sessionShortcut === 'pause';
-        if (isButtonLikeElement(target) && !allowsSpaceOverride) {
-          return;
-        }
-        event.preventDefault();
-        handleTogglePause();
-        return;
-      }
-
-      if (key === 'n') {
-        event.preventDefault();
-        onNext();
-        return;
-      }
-
-      if (key === 'p') {
-        event.preventDefault();
-        onPrev();
-        return;
-      }
-
-      if (key === 'f') {
-        event.preventDefault();
-        toggleFullscreen();
-      }
+      handleKeyboardShortcut(event, codeShortcutMap, keyShortcutMap);
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [shortcutsEnabled, handleTogglePause, onNext, onPrev, toggleFullscreen]);
+  }, [shortcutsEnabled, codeShortcutMap, keyShortcutMap]);
 
   return (
     <div
@@ -234,7 +219,9 @@ export default function SessionView({
           <div className="flex flex-col">
             <h1 className="text-lg font-semibold tracking-tight">Tempo Pose</h1>
             <span className="text-muted-foreground text-xs">
-              {shortcutsEnabled ? 'Keyboard shortcuts active' : 'Click to enable keyboard shortcuts'}
+              {shortcutsEnabled
+                ? 'Keyboard shortcuts active'
+                : 'Click to enable keyboard shortcuts'}
             </span>
           </div>
           <Button variant="outline" size="sm" onClick={onEndSession}>
@@ -323,5 +310,3 @@ export default function SessionView({
     </div>
   );
 }
-
-
