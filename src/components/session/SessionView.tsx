@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { FocusEvent } from 'react';
+import { Maximize, Minimize } from 'lucide-react';
 import Footer from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -306,6 +307,20 @@ export default function SessionView({
             <Button variant="outline" onClick={onNext} disabled={!hasMultipleImages}>
               Next
             </Button>
+            {fullscreenSupported && (
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={toggleFullscreen}
+                aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+              >
+                {isFullscreen ? (
+                  <Minimize className="h-4 w-4" aria-hidden="true" />
+                ) : (
+                  <Maximize className="h-4 w-4" aria-hidden="true" />
+                )}
+              </Button>
+            )}
           </div>
           <div className="text-muted-foreground mt-3 text-center text-xs">
             <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
