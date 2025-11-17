@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { FocusEvent } from 'react';
 import Footer from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { formatTimeFromSeconds } from '@/lib/timer';
 import type { ImageItem } from '@/types/core';
 import {
@@ -298,8 +299,33 @@ export default function SessionView({
               Next
             </Button>
           </div>
-          <div className="text-muted-foreground mt-2 text-center text-xs">
-            {isFullscreen ? 'Press F to exit fullscreen' : 'Press F for fullscreen'}
+          <div className="text-muted-foreground mt-3 text-center text-xs">
+            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
+              <span className="flex items-center gap-1.5">
+                <Badge variant="secondary" className="font-mono text-[10px] uppercase">
+                  Space
+                </Badge>
+                <span>pause/resume</span>
+              </span>
+              <span className="flex items-center gap-1.5">
+                <Badge variant="secondary" className="font-mono text-[10px] uppercase">
+                  N
+                </Badge>
+                <span>next</span>
+              </span>
+              <span className="flex items-center gap-1.5">
+                <Badge variant="secondary" className="font-mono text-[10px] uppercase">
+                  P
+                </Badge>
+                <span>prev</span>
+              </span>
+              <span className="flex items-center gap-1.5">
+                <Badge variant="secondary" className="font-mono text-[10px] uppercase">
+                  F
+                </Badge>
+                <span>{isFullscreen ? 'exit fullscreen' : 'fullscreen'}</span>
+              </span>
+            </div>
           </div>
         </div>
       </main>
