@@ -1,11 +1,10 @@
-import { useStore } from '@/store';
 import { Button } from '@/components/ui/button';
+import { useStore } from '@/store';
 import { useNavigate } from 'react-router-dom';
-import Footer from '@/components/layout/Footer';
 import { useSessionClock } from '@/hooks/useSessionClock';
 import { resolveTimerDurationMs } from '@/lib/timer';
-import { formatTimeFromSeconds } from '@/lib/timer';
 import type { TimerPresetId } from '@/types/core';
+import SessionView from '@/components/session/SessionView';
 
 export default function SessionPage() {
   const navigate = useNavigate();
@@ -74,113 +73,27 @@ export default function SessionPage() {
     );
   }
 
+  const handleEndSession = () => {
+    stopSession();
+    clearImages();
+    navigate('/');
+  };
+
   return (
-    <div className="bg-background text-foreground flex h-svh flex-col overflow-hidden">
-      {/* Header */}
-      <div className="border-border bg-background shrink-0 border-b">
-        <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
-          <h1 className="text-lg font-semibold tracking-tight">Tempo Pose</h1>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              stopSession();
-              // Clear images when ending session to show empty gallery state
-              clearImages();
-              navigate('/');
-            }}
-          >
-            End Session
-          </Button>
-        </div>
-      </div>
-
-      {/* Main content area - takes remaining space */}
-      <main className="mx-auto flex max-w-5xl flex-1 flex-col overflow-hidden px-4 py-4">
-        {/* Progress indicator - fixed height */}
-        <div className="shrink-0 space-y-3 pb-3">
-          <div className="flex items-center justify-between">
-            <div className="text-muted-foreground text-sm">
-              Progress:{' '}
-              <span className="font-medium">
-                {currentPosition}/{totalImages}
-              </span>
-            </div>
-            <div className="text-muted-foreground text-sm">
-              Remaining: <span className="font-medium">{remaining}</span>
-            </div>
-          </div>
-
-          {/* TEMPO-41: Linear progress bar tied to current interval */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-muted-foreground text-xs">
-                Next image in:{' '}
-                <span className="font-medium">{formatTimeFromSeconds(remainingSeconds)}</span>
-              </span>
-              {isPaused && (
-                <span className="text-muted-foreground text-xs font-medium">Paused</span>
-              )}
-            </div>
-            <div className="bg-muted h-2 w-full overflow-hidden rounded-full">
-              <div
-                className="bg-primary h-full transition-all duration-100 ease-linear"
-                style={{ width: `${Math.min(100, Math.max(0, progressPercentage))}%` }}
-                role="progressbar"
-                aria-valuenow={progressPercentage}
-                aria-valuemin={0}
-                aria-valuemax={100}
-                aria-label="Interval progress"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Image area - flex-1 to take remaining space */}
-        <figure className="flex flex-1 flex-col overflow-hidden">
-          <div className="flex flex-1 items-center justify-center overflow-hidden">
-            <img
-              src={currentImage.url}
-              alt={currentImage.name ?? 'Reference image'}
-              className="max-h-full max-w-full rounded object-contain"
-            />
-          </div>
-          <figcaption className="text-muted-foreground shrink-0 pt-2 text-center text-sm">
-            {currentImage.name ?? 'Image'}
-          </figcaption>
-        </figure>
-
-        {/* Navigation controls - fixed height */}
-        <div className="shrink-0 pt-4">
-          <div className="flex items-center justify-center gap-4">
-            <Button variant="outline" onClick={prev} disabled={sessionQueue.length <= 1}>
-              Previous
-            </Button>
-            {/* TEMPO-40: Pause/Resume button */}
-            <Button
-              variant={isPaused ? 'default' : 'outline'}
-              onClick={() => {
-                if (isPaused) {
-                  resumeSession();
-                } else {
-                  pauseSession();
-                }
-              }}
-              aria-label={isPaused ? 'Resume session' : 'Pause session'}
-            >
-              {isPaused ? 'Resume' : 'Pause'}
-            </Button>
-            <Button variant="outline" onClick={next} disabled={sessionQueue.length <= 1}>
-              Next
-            </Button>
-          </div>
-        </div>
-      </main>
-
-      {/* Footer */}
-      <div className="shrink-0">
-        <Footer />
-      </div>
-    </div>
+    <SessionView
+      currentImage={currentImage}
+      currentPosition={currentPosition}
+      totalImages={totalImages}
+      remainingCount={remaining}
+      progressPercentage={progressPercentage}
+      remainingSeconds={remainingSeconds}
+      isPaused={isPaused}
+      onPrev={prev}
+      onNext={next}
+      onPause={pauseSession}
+      onResume={resumeSession}
+      onEndSession={handleEndSession}
+      hasMultipleImages={sessionQueue.length > 1}
+    />
   );
 }
