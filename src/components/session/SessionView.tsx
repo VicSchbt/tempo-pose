@@ -10,6 +10,7 @@ import {
   handleKeyboardShortcut,
   isButtonLikeElement,
 } from '@/utils/keyboardShortcuts';
+import { getFullscreenHint, isFullscreenSupported } from '@/utils/fullscreen';
 
 type SessionViewProps = {
   currentImage: ImageItem;
@@ -64,7 +65,13 @@ export default function SessionView({
     return Math.min(100, Math.max(0, progressPercentage));
   }, [progressPercentage]);
 
+  const fullscreenSupported = useMemo(() => isFullscreenSupported(), []);
+
   const toggleFullscreen = useCallback(() => {
+    if (!fullscreenSupported) {
+      return;
+    }
+
     const node = rootRef.current;
     if (!node || typeof document === 'undefined') {
       return;
@@ -75,7 +82,7 @@ export default function SessionView({
     } else {
       void node.requestFullscreen?.();
     }
-  }, []);
+  }, [fullscreenSupported]);
 
   const shortcutsEnabled = hasFocusWithin && isWindowFocused;
 
@@ -114,33 +121,34 @@ export default function SessionView({
     [handleTogglePause],
   );
 
-  const keyShortcutMap = useMemo<Map<string, ShortcutBinding>>(
-    () =>
-      new Map([
-        [
-          'n',
-          {
-            action: onNext,
-            preventDefault: true,
-          },
-        ],
-        [
-          'p',
-          {
-            action: onPrev,
-            preventDefault: true,
-          },
-        ],
-        [
-          'f',
-          {
-            action: toggleFullscreen,
-            preventDefault: true,
-          },
-        ],
-      ]),
-    [onNext, onPrev, toggleFullscreen],
-  );
+  const keyShortcutMap = useMemo<Map<string, ShortcutBinding>>(() => {
+    const map = new Map<string, ShortcutBinding>([
+      [
+        'n',
+        {
+          action: onNext,
+          preventDefault: true,
+        },
+      ],
+      [
+        'p',
+        {
+          action: onPrev,
+          preventDefault: true,
+        },
+      ],
+    ]);
+
+    // Only add fullscreen shortcut if supported
+    if (fullscreenSupported) {
+      map.set('f', {
+        action: toggleFullscreen,
+        preventDefault: true,
+      });
+    }
+
+    return map;
+  }, [onNext, onPrev, toggleFullscreen, fullscreenSupported]);
 
   useEffect(() => {
     const node = rootRef.current;
@@ -319,12 +327,14 @@ export default function SessionView({
                 </Badge>
                 <span>prev</span>
               </span>
-              <span className="flex items-center gap-1.5">
-                <Badge variant="secondary" className="font-mono text-[10px] uppercase">
-                  F
-                </Badge>
-                <span>{isFullscreen ? 'exit fullscreen' : 'fullscreen'}</span>
-              </span>
+              {fullscreenSupported && (
+                <span className="flex items-center gap-1.5">
+                  <Badge variant="secondary" className="font-mono text-[10px] uppercase">
+                    F
+                  </Badge>
+                  <span>{getFullscreenHint(isFullscreen, fullscreenSupported)}</span>
+                </span>
+              )}
             </div>
           </div>
         </div>
