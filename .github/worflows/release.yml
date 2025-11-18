@@ -1,0 +1,68 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: 'Semver release type (patch, minor, major)'
+        required: true
+        default: 'patch'
+
+permissions:
+  contents: write # we need to push tags + commits
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # Important so tags & history are present for changelog
+          fetch-depth: 0
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests and build
+        run: |
+          npm run lint
+          npm test
+          npm run build
+
+      - name: Bump version and create tag
+        id: bump
+        run: |
+          RELEASE_TYPE=${{ github.event.inputs.release_type }}
+
+          # Bump package.json version + create git tag
+          NEW_VERSION=$(npm version "$RELEASE_TYPE" -m "chore(release): %s")
+
+          echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Generate changelog
+        run: |
+          npm run release:changelog
+          git add CHANGELOG.md package.json package-lock.json
+          git commit -m "docs: update changelog for ${{ steps.bump.outputs.new_version }}" || echo "No changes to commit"
+
+      - name: Push changes and tags
+        run: |
+          git push origin HEAD:main
+          git push origin --tags
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.bump.outputs.new_version }}
+          name: Release ${{ steps.bump.outputs.new_version }}
+          body: |
+            Automated release ${{ steps.bump.outputs.new_version }}.
+            See CHANGELOG.md for details.

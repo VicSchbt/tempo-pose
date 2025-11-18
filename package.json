@@ -12,7 +12,8 @@
     "lint:format": "prettier --check .",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "test:watch": "vitest --watch"
+    "test:watch": "vitest --watch",
+    "release:changelog": "node scripts/generate-changelog.mjs"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",
