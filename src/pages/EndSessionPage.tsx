@@ -60,13 +60,13 @@ export default function EndSessionPage() {
 
           <div className="flex flex-wrap items-center justify-center gap-3">
             <Button onClick={() => navigate('/')}>Back to Home</Button>
-            <Button
+            {/* <Button
               variant="outline"
               onClick={() => navigate('/')}
               aria-label="Start a new session"
             >
               Start another session
-            </Button>
+            </Button> */}
           </div>
         </section>
       </Main>
