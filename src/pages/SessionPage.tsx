@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useStore } from '@/store';
 import { useNavigate } from 'react-router-dom';
@@ -18,15 +19,26 @@ export default function SessionPage() {
   const customSeconds = useStore((s) => s.customSeconds);
   const next = useStore((s) => s.next);
   const prev = useStore((s) => s.prev);
-  const stopSession = useStore((s) => s.stopSession);
+  const endSession = useStore((s) => s.endSession);
   const clearImages = useStore((s) => s.clearImages);
   const pauseSession = useStore((s) => s.pauseSession);
   const resumeSession = useStore((s) => s.resumeSession);
+  const sessionSummary = useStore((s) => s.sessionSummary);
 
   // TEMPO-39: Use session clock hook for drift-safe timing
   useSessionClock();
 
+  useEffect(() => {
+    if (!isActive && sessionSummary) {
+      navigate('/session/end', { replace: true });
+    }
+  }, [isActive, sessionSummary, navigate]);
+
   // If session is not active, redirect to home
+  if (sessionSummary && !isActive) {
+    return null;
+  }
+
   if (!isActive || sessionQueue.length === 0) {
     return (
       <div className="flex h-svh flex-col items-center justify-center gap-4">
@@ -74,9 +86,8 @@ export default function SessionPage() {
   }
 
   const handleEndSession = () => {
-    stopSession();
+    endSession('manual');
     clearImages();
-    navigate('/');
   };
 
   return (
