@@ -3,7 +3,7 @@ export type SessionStatus = 'idle' | 'running' | 'paused' | 'finished';
 export type SessionEndReason = 'manual' | 'completed';
 
 export type SessionSummary = {
-  totalImages: number;
+  imagesShown: number;
   startedAt: number;
   endedAt: number;
   durationMs: number;

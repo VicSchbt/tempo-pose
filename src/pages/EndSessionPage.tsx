@@ -22,6 +22,9 @@ export default function EndSessionPage() {
   }
 
   const durationSeconds = Math.max(0, Math.round(sessionSummary.durationMs / 1000));
+  const averageMs =
+    sessionSummary.imagesShown > 0 ? sessionSummary.durationMs / sessionSummary.imagesShown : 0;
+  const averageSeconds = Math.max(0, averageMs / 1000);
   const reasonLabel =
     sessionSummary.reason === 'completed' ? 'Full session completed' : 'Ended manually';
 
@@ -43,17 +46,15 @@ export default function EndSessionPage() {
           <div className="grid w-full gap-4 rounded-lg border border-dashed p-6 sm:grid-cols-3">
             <div>
               <p className="text-muted-foreground text-sm">Images completed</p>
-              <p className="text-2xl font-semibold">{sessionSummary.totalImages}</p>
+              <p className="text-2xl font-semibold">{sessionSummary.imagesShown}</p>
             </div>
             <div>
               <p className="text-muted-foreground text-sm">Duration</p>
               <p className="text-2xl font-semibold">{formatTimeFromSeconds(durationSeconds)}</p>
             </div>
             <div>
-              <p className="text-muted-foreground text-sm">Ended</p>
-              <p className="text-2xl font-semibold">
-                {new Date(sessionSummary.endedAt).toLocaleTimeString()}
-              </p>
+              <p className="text-muted-foreground text-sm">Average per image</p>
+              <p className="text-2xl font-semibold">{averageSeconds.toFixed(1)}s</p>
             </div>
           </div>
 

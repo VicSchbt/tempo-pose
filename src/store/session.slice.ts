@@ -32,9 +32,11 @@ export type SessionState = {
 const finalizeSessionState = (state: SessionState, reason: SessionEndReason) => {
   const endedAt = Date.now();
   const startedAt = state.sessionStartTime ?? endedAt;
+  const plannedImages = state.sessionQueue.length;
+  const imagesShown = Math.max(0, Math.min(state.ptr + 1, plannedImages));
 
   const summary: SessionSummary = {
-    totalImages: state.sessionQueue.length,
+    imagesShown,
     startedAt,
     endedAt,
     durationMs: Math.max(0, endedAt - startedAt),
