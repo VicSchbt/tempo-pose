@@ -31,7 +31,7 @@ Object.defineProperty(document, 'exitFullscreen', {
   configurable: true,
 });
 
-HTMLElement.prototype.requestFullscreen = vi.fn(function () {
+HTMLElement.prototype.requestFullscreen = vi.fn(function (this: HTMLElement) {
   Object.defineProperty(document, 'fullscreenElement', {
     value: this,
     writable: true,

@@ -8,6 +8,7 @@ const mockImage: ImageItem = {
   id: 'test-image-1',
   url: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
   name: 'Test Image',
+  file: new File(['mock'], 'test-image.png', { type: 'image/png' }),
   status: 'ok',
 };
 
@@ -205,7 +206,6 @@ describe('SessionView keyboard shortcuts', () => {
   });
 
   it('prevents default behavior for shortcut keys', async () => {
-    const user = userEvent.setup();
     render(<SessionView {...defaultProps} />);
 
     const sessionView = screen.getByLabelText('Session view');
