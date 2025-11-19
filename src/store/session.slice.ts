@@ -11,6 +11,7 @@ export type SessionState = {
 
   // settings
   avoidRepeatUntilExhausted: boolean;
+  isMuted: boolean;
 
   // clock state (TEMPO-39, TEMPO-40)
   isPaused: boolean;
@@ -23,6 +24,7 @@ export type SessionState = {
   prev: () => void;
   endSession: (reason?: SessionEndReason) => void;
   setAvoidRepeat: (v: boolean) => void;
+  toggleMute: () => void;
   pauseSession: () => void; // TEMPO-40
   resumeSession: () => void; // TEMPO-40
   resetInterval: () => void; // TEMPO-39: reset interval clock
@@ -67,6 +69,7 @@ export const createSessionSlice: StateCreator<
   sessionStartTime: null,
   sessionSummary: null,
   avoidRepeatUntilExhausted: true,
+  isMuted: false,
   isPaused: false,
   intervalStartTime: null,
   elapsedMs: 0,
@@ -142,6 +145,7 @@ export const createSessionSlice: StateCreator<
     set((state) => finalizeSessionState(state, reason), false, 'session/stop'),
 
   setAvoidRepeat: (v) => set({ avoidRepeatUntilExhausted: v }, false, 'session/setAvoidRepeat'),
+  toggleMute: () => set((state) => ({ isMuted: !state.isMuted }), false, 'session/toggleMute'),
 
   pauseSession: () =>
     set(

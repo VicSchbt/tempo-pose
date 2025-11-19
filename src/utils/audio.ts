@@ -1,8 +1,13 @@
 /**
  * Utility function to play the ding sound when timer expires.
  * Uses the Audio API to play the sound file from the public directory.
+ * @param isMuted - If true, the sound will not play
  */
-export function playDingSound(): void {
+export function playDingSound(isMuted = false): void {
+  if (isMuted) {
+    return;
+  }
+
   try {
     const audio = new Audio('/audio/ding.mp3');
     audio.volume = 0.7; // Set volume to 70%
@@ -22,8 +27,13 @@ export function playDingSound(): void {
  */
 export function createTickingSoundManager() {
   let tickingAudio: HTMLAudioElement | null = null;
+  let isMuted = false;
 
-  const startTicking = (): void => {
+  const startTicking = (muted = false): void => {
+    isMuted = muted;
+    if (isMuted) {
+      return;
+    }
     try {
       // Stop any existing ticking sound first
       stopTicking();
@@ -61,15 +71,25 @@ export function createTickingSoundManager() {
     }
   };
 
-  const resumeTicking = (): void => {
-    if (tickingAudio) {
-      try {
-        tickingAudio.play().catch((error) => {
-          console.debug('Could not resume ticking sound:', error);
-        });
-      } catch (error) {
-        console.debug('Error resuming ticking sound:', error);
-      }
+  const resumeTicking = (muted = false): void => {
+    isMuted = muted;
+    if (isMuted || !tickingAudio) {
+      return;
+    }
+
+    try {
+      tickingAudio.play().catch((error) => {
+        console.debug('Could not resume ticking sound:', error);
+      });
+    } catch (error) {
+      console.debug('Error resuming ticking sound:', error);
+    }
+  };
+
+  const setMuted = (muted: boolean): void => {
+    isMuted = muted;
+    if (isMuted && tickingAudio) {
+      tickingAudio.pause();
     }
   };
 
@@ -78,5 +98,6 @@ export function createTickingSoundManager() {
     stopTicking,
     pauseTicking,
     resumeTicking,
+    setMuted,
   };
 }

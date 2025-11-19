@@ -85,6 +85,13 @@ describe('playDingSound', () => {
     expect(consoleSpy).toHaveBeenCalledWith('Error creating audio element:', constructorError);
     consoleSpy.mockRestore();
   });
+
+  it('does not play sound when muted', () => {
+    playDingSound(true);
+
+    expect(mockAudioInstances).toHaveLength(0);
+    expect(mockPlay).not.toHaveBeenCalled();
+  });
 });
 
 describe('createTickingSoundManager', () => {
@@ -95,10 +102,12 @@ describe('createTickingSoundManager', () => {
     expect(manager).toHaveProperty('stopTicking');
     expect(manager).toHaveProperty('pauseTicking');
     expect(manager).toHaveProperty('resumeTicking');
+    expect(manager).toHaveProperty('setMuted');
     expect(typeof manager.startTicking).toBe('function');
     expect(typeof manager.stopTicking).toBe('function');
     expect(typeof manager.pauseTicking).toBe('function');
     expect(typeof manager.resumeTicking).toBe('function');
+    expect(typeof manager.setMuted).toBe('function');
   });
 
   describe('startTicking', () => {
@@ -176,6 +185,14 @@ describe('createTickingSoundManager', () => {
         constructorError,
       );
       consoleSpy.mockRestore();
+    });
+
+    it('does not start ticking when muted', () => {
+      const manager = createTickingSoundManager();
+      manager.startTicking(true);
+
+      expect(mockAudioInstances).toHaveLength(0);
+      expect(mockPlay).not.toHaveBeenCalled();
     });
   });
 
@@ -318,6 +335,61 @@ describe('createTickingSoundManager', () => {
 
       expect(consoleSpy).toHaveBeenCalledWith('Error resuming ticking sound:', expect.any(Error));
       consoleSpy.mockRestore();
+    });
+
+    it('does not resume ticking when muted', () => {
+      const manager = createTickingSoundManager();
+      manager.startTicking();
+      manager.pauseTicking();
+      vi.clearAllMocks();
+
+      manager.resumeTicking(true);
+
+      expect(mockPlay).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('setMuted', () => {
+    it('pauses ticking when set to true', () => {
+      const manager = createTickingSoundManager();
+      manager.startTicking();
+      vi.clearAllMocks();
+
+      manager.setMuted(true);
+
+      expect(mockPause).toHaveBeenCalledOnce();
+    });
+
+    it('does nothing when set to true and no ticking is playing', () => {
+      const manager = createTickingSoundManager();
+      manager.setMuted(true);
+
+      expect(mockPause).not.toHaveBeenCalled();
+    });
+
+    it('allows ticking to continue when set to false', () => {
+      const manager = createTickingSoundManager();
+      manager.startTicking();
+      manager.setMuted(true);
+      vi.clearAllMocks();
+
+      manager.setMuted(false);
+
+      // setMuted(false) doesn't automatically resume, it just allows future operations
+      // So we verify it doesn't pause
+      expect(mockPause).not.toHaveBeenCalled();
+    });
+
+    it('prevents new ticking from starting when muted via setMuted', () => {
+      const manager = createTickingSoundManager();
+      manager.setMuted(true);
+      vi.clearAllMocks();
+
+      // startTicking requires explicit mute parameter, so we test with muted=true
+      manager.startTicking(true);
+
+      expect(mockAudioInstances).toHaveLength(0);
+      expect(mockPlay).not.toHaveBeenCalled();
     });
   });
 

@@ -14,6 +14,7 @@ import { playDingSound, createTickingSoundManager } from '@/utils/audio';
 export function useSessionClock() {
   const isActive = useStore((s) => s.isActive);
   const isPaused = useStore((s) => s.isPaused);
+  const isMuted = useStore((s) => s.isMuted);
   const intervalStartTime = useStore((s) => s.intervalStartTime);
   const preset = useStore((s) => s.preset);
   const customSeconds = useStore((s) => s.customSeconds);
@@ -53,6 +54,13 @@ export function useSessionClock() {
       }
     };
   }, []);
+
+  // Update mute state in ticking manager
+  useEffect(() => {
+    if (tickingManagerRef.current) {
+      tickingManagerRef.current.setMuted(isMuted);
+    }
+  }, [isMuted]);
 
   // Reset ticking state when interval changes
   useEffect(() => {
@@ -112,14 +120,14 @@ export function useSessionClock() {
         if (!tickingStartedRef.current) {
           // Start ticking for the first time
           if (tickingManagerRef.current) {
-            tickingManagerRef.current.startTicking();
+            tickingManagerRef.current.startTicking(isMuted);
             tickingStartedRef.current = true;
             tickingPausedRef.current = false;
           }
         } else if (tickingPausedRef.current) {
           // Resume ticking if it was paused
           if (tickingManagerRef.current) {
-            tickingManagerRef.current.resumeTicking();
+            tickingManagerRef.current.resumeTicking(isMuted);
             tickingPausedRef.current = false;
           }
         }
@@ -141,7 +149,7 @@ export function useSessionClock() {
         tickingStartedRef.current = false;
         tickingPausedRef.current = false;
         // Play ding sound when timer expires
-        playDingSound();
+        playDingSound(isMuted);
         // Auto-advance to next image
         // The next() action will reset intervalStartTime and elapsedMs
         next();
@@ -160,7 +168,7 @@ export function useSessionClock() {
         intervalRef.current = null;
       }
     };
-  }, [isActive, isPaused, intervalStartTime, preset, customSeconds, updateElapsed, next]);
+  }, [isActive, isPaused, isMuted, intervalStartTime, preset, customSeconds, updateElapsed, next]);
 
   // Cleanup on unmount
   useEffect(() => {
