@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useStore } from '@/store';
 import { resolveTimerDurationMs } from '@/lib/timer';
 import type { TimerPresetId } from '@/types/core';
+import { playDingSound } from '@/utils/audio';
 
 /**
  * Hook for managing session clock with drift-safe timing.
@@ -65,6 +66,8 @@ export function useSessionClock() {
 
       // Check if interval has completed
       if (remaining <= 0) {
+        // Play ding sound when timer expires
+        playDingSound();
         // Auto-advance to next image
         // The next() action will reset intervalStartTime and elapsedMs
         next();
