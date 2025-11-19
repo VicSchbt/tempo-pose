@@ -1,5 +1,15 @@
 export type SessionStatus = 'idle' | 'running' | 'paused' | 'finished';
 
+export type SessionEndReason = 'manual' | 'completed';
+
+export type SessionSummary = {
+  imagesShown: number;
+  startedAt: number;
+  endedAt: number;
+  durationMs: number;
+  reason: SessionEndReason;
+};
+
 export type ImageStatus = 'ok' | 'broken';
 
 export type ImageItem = {

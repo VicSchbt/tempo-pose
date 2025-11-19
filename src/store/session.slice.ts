@@ -1,4 +1,4 @@
-import type { ImageItem } from '@/types/core';
+import type { ImageItem, SessionEndReason, SessionSummary } from '@/types/core';
 import type { StateCreator } from 'zustand';
 import { shuffleArray } from '@/lib/shuffle';
 
@@ -6,6 +6,8 @@ export type SessionState = {
   sessionQueue: string[]; // queue of image IDs for the current session (TEMPO-34)
   ptr: number; // pointer into 'sessionQueue' (TEMPO-36)
   isActive: boolean;
+  sessionStartTime: number | null;
+  sessionSummary: SessionSummary | null;
 
   // settings
   avoidRepeatUntilExhausted: boolean;
@@ -19,12 +21,38 @@ export type SessionState = {
   startSession: (images: ImageItem[]) => boolean; // returns true if session started, false if empty (TEMPO-35)
   next: () => void;
   prev: () => void;
-  stopSession: () => void;
+  endSession: (reason?: SessionEndReason) => void;
   setAvoidRepeat: (v: boolean) => void;
   pauseSession: () => void; // TEMPO-40
   resumeSession: () => void; // TEMPO-40
   resetInterval: () => void; // TEMPO-39: reset interval clock
   updateElapsed: (elapsedMs: number) => void; // TEMPO-39: update elapsed time
+};
+
+const finalizeSessionState = (state: SessionState, reason: SessionEndReason) => {
+  const endedAt = Date.now();
+  const startedAt = state.sessionStartTime ?? endedAt;
+  const plannedImages = state.sessionQueue.length;
+  const imagesShown = Math.max(0, Math.min(state.ptr + 1, plannedImages));
+
+  const summary: SessionSummary = {
+    imagesShown,
+    startedAt,
+    endedAt,
+    durationMs: Math.max(0, endedAt - startedAt),
+    reason,
+  };
+
+  return {
+    isActive: false,
+    sessionQueue: [],
+    ptr: 0,
+    isPaused: false,
+    intervalStartTime: null,
+    elapsedMs: 0,
+    sessionStartTime: null,
+    sessionSummary: summary,
+  };
 };
 
 export const createSessionSlice: StateCreator<
@@ -36,6 +64,8 @@ export const createSessionSlice: StateCreator<
   sessionQueue: [],
   ptr: 0,
   isActive: false,
+  sessionStartTime: null,
+  sessionSummary: null,
   avoidRepeatUntilExhausted: true,
   isPaused: false,
   intervalStartTime: null,
@@ -58,6 +88,8 @@ export const createSessionSlice: StateCreator<
         sessionQueue: shuffledQueue,
         ptr: 0,
         isActive: true,
+        sessionStartTime: Date.now(),
+        sessionSummary: null,
         isPaused: false,
         intervalStartTime: Date.now(),
         elapsedMs: 0,
@@ -74,21 +106,13 @@ export const createSessionSlice: StateCreator<
       (state) => {
         if (!state.isActive || state.sessionQueue.length === 0) return state;
 
-        let idx = state.ptr + 1;
+        const isLastImage = state.ptr >= state.sessionQueue.length - 1;
 
-        if (idx >= state.sessionQueue.length) {
-          // Exhausted once — either wrap or reshuffle to avoid immediate repeats
-          if (state.avoidRepeatUntilExhausted) {
-            const reshuffled = shuffleArray(state.sessionQueue);
-            return {
-              sessionQueue: reshuffled,
-              ptr: 0,
-              intervalStartTime: Date.now(),
-              elapsedMs: 0,
-            };
-          }
-          idx = 0; // simple wrap
+        if (isLastImage) {
+          return finalizeSessionState(state, 'completed');
         }
+
+        const idx = state.ptr + 1;
         return {
           ptr: idx,
           intervalStartTime: Date.now(),
@@ -114,19 +138,8 @@ export const createSessionSlice: StateCreator<
       'session/prev',
     ),
 
-  stopSession: () =>
-    set(
-      {
-        isActive: false,
-        sessionQueue: [],
-        ptr: 0,
-        isPaused: false,
-        intervalStartTime: null,
-        elapsedMs: 0,
-      },
-      false,
-      'session/stop',
-    ),
+  endSession: (reason = 'manual') =>
+    set((state) => finalizeSessionState(state, reason), false, 'session/stop'),
 
   setAvoidRepeat: (v) => set({ avoidRepeatUntilExhausted: v }, false, 'session/setAvoidRepeat'),
 
