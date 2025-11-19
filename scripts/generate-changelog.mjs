@@ -1,7 +1,12 @@
 import { execSync } from 'node:child_process';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 
 function run(cmd) {
-  return execSync(cmd, { encoding: 'utf-8' }).trim();
+  try {
+    return execSync(cmd, { encoding: 'utf-8' }).trim();
+  } catch {
+    return '';
+  }
 }
 
 let lastTag = '';
@@ -13,9 +18,14 @@ try {
 
 // Get log since last tag or full log
 const range = lastTag ? `${lastTag}..HEAD` : '';
-const log = run(`git log ${range} --pretty=format:"- %s (%h)"`);
+let log = '';
+try {
+  log = run(`git log ${range} --pretty=format:"- %s (%h)"`);
+} catch {
+  log = '';
+}
 
-const newSection = `\n\n## ${new Date().toISOString().slice(0, 10)}\n${log}\n`;
+const newSection = `\n\n## ${new Date().toISOString().slice(0, 10)}\n${log || '- No commits found'}\n`;
 
 const file = 'CHANGELOG.md';
 let current = existsSync(file) ? readFileSync(file, 'utf8') : '# Changelog\n';
