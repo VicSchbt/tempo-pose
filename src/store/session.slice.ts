@@ -1,6 +1,7 @@
 import type { ImageItem, SessionEndReason, SessionSummary } from '@/types/core';
 import type { StateCreator } from 'zustand';
 import { shuffleArray } from '@/lib/shuffle';
+import { prefersReducedSound } from '@/utils/prefersReducedSound';
 
 export type SessionState = {
   sessionQueue: string[]; // queue of image IDs for the current session (TEMPO-34)
@@ -94,6 +95,7 @@ export const createSessionSlice: StateCreator<
         sessionStartTime: Date.now(),
         sessionSummary: null,
         isPaused: false,
+        isMuted: prefersReducedSound(), // Respect OS "reduce sound" preference
         intervalStartTime: Date.now(),
         elapsedMs: 0,
       },
