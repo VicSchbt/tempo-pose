@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { FocusEvent } from 'react';
-import { Maximize, Minimize } from 'lucide-react';
+import { Maximize, Minimize, Volume2, VolumeX } from 'lucide-react';
 import Footer from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -21,10 +21,12 @@ type SessionViewProps = {
   progressPercentage: number;
   remainingSeconds: number;
   isPaused: boolean;
+  isMuted: boolean;
   onPrev: () => void;
   onNext: () => void;
   onPause: () => void;
   onResume: () => void;
+  onToggleMute: () => void;
   onEndSession: () => void;
   hasMultipleImages: boolean;
 };
@@ -37,10 +39,12 @@ export default function SessionView({
   progressPercentage,
   remainingSeconds,
   isPaused,
+  isMuted,
   onPrev,
   onNext,
   onPause,
   onResume,
+  onToggleMute,
   onEndSession,
   hasMultipleImages,
 }: SessionViewProps) {
@@ -306,6 +310,18 @@ export default function SessionView({
             </Button>
             <Button variant="outline" onClick={onNext} disabled={!hasMultipleImages}>
               Next
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={onToggleMute}
+              aria-label={isMuted ? 'Unmute sounds' : 'Mute sounds'}
+            >
+              {isMuted ? (
+                <VolumeX className="h-4 w-4" aria-hidden="true" />
+              ) : (
+                <Volume2 className="h-4 w-4" aria-hidden="true" />
+              )}
             </Button>
             {fullscreenSupported && (
               <Button

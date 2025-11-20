@@ -23,6 +23,8 @@ export default function SessionPage() {
   const clearImages = useStore((s) => s.clearImages);
   const pauseSession = useStore((s) => s.pauseSession);
   const resumeSession = useStore((s) => s.resumeSession);
+  const isMuted = useStore((s) => s.isMuted);
+  const toggleMute = useStore((s) => s.toggleMute);
   const sessionSummary = useStore((s) => s.sessionSummary);
 
   // TEMPO-39: Use session clock hook for drift-safe timing
@@ -99,10 +101,12 @@ export default function SessionPage() {
       progressPercentage={progressPercentage}
       remainingSeconds={remainingSeconds}
       isPaused={isPaused}
+      isMuted={isMuted}
       onPrev={prev}
       onNext={next}
       onPause={pauseSession}
       onResume={resumeSession}
+      onToggleMute={toggleMute}
       onEndSession={handleEndSession}
       hasMultipleImages={sessionQueue.length > 1}
     />

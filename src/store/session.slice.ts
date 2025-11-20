@@ -1,6 +1,7 @@
 import type { ImageItem, SessionEndReason, SessionSummary } from '@/types/core';
 import type { StateCreator } from 'zustand';
 import { shuffleArray } from '@/lib/shuffle';
+import { prefersReducedSound } from '@/utils/prefersReducedSound';
 
 export type SessionState = {
   sessionQueue: string[]; // queue of image IDs for the current session (TEMPO-34)
@@ -11,6 +12,7 @@ export type SessionState = {
 
   // settings
   avoidRepeatUntilExhausted: boolean;
+  isMuted: boolean;
 
   // clock state (TEMPO-39, TEMPO-40)
   isPaused: boolean;
@@ -23,6 +25,7 @@ export type SessionState = {
   prev: () => void;
   endSession: (reason?: SessionEndReason) => void;
   setAvoidRepeat: (v: boolean) => void;
+  toggleMute: () => void;
   pauseSession: () => void; // TEMPO-40
   resumeSession: () => void; // TEMPO-40
   resetInterval: () => void; // TEMPO-39: reset interval clock
@@ -67,6 +70,7 @@ export const createSessionSlice: StateCreator<
   sessionStartTime: null,
   sessionSummary: null,
   avoidRepeatUntilExhausted: true,
+  isMuted: false,
   isPaused: false,
   intervalStartTime: null,
   elapsedMs: 0,
@@ -91,6 +95,7 @@ export const createSessionSlice: StateCreator<
         sessionStartTime: Date.now(),
         sessionSummary: null,
         isPaused: false,
+        isMuted: prefersReducedSound(), // Respect OS "reduce sound" preference
         intervalStartTime: Date.now(),
         elapsedMs: 0,
       },
@@ -142,6 +147,7 @@ export const createSessionSlice: StateCreator<
     set((state) => finalizeSessionState(state, reason), false, 'session/stop'),
 
   setAvoidRepeat: (v) => set({ avoidRepeatUntilExhausted: v }, false, 'session/setAvoidRepeat'),
+  toggleMute: () => set((state) => ({ isMuted: !state.isMuted }), false, 'session/toggleMute'),
 
   pauseSession: () =>
     set(
