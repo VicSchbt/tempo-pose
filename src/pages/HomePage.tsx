@@ -6,6 +6,7 @@ import TimerControls from '@/components/timer/TimerControls';
 import SessionControls from '@/components/session/SessionControls';
 import ImageGrid from '@/components/gallery/ImageGrid';
 import { Toaster } from 'sonner';
+import FirstTimeHelpDialog from '@/components/help/FirstTimeHelpDialog';
 
 export default function HomePage() {
   return (
@@ -28,6 +29,7 @@ export default function HomePage() {
       </Main>
       <Footer />
       <Toaster richColors closeButton position="top-right" />
+      <FirstTimeHelpDialog />
     </div>
   );
 }
