@@ -50,48 +50,50 @@ export function DropSurface({
         // size & layout
         'relative mx-auto flex h-64 w-full max-w-3xl flex-col items-center justify-center p-4 sm:h-72',
         // visuals
-        'rounded-3xl border-2 border-dashed bg-neutral-50 shadow-sm transition-all duration-300',
+        'rounded-3xl border-2 border-dashed bg-muted shadow-sm transition-all duration-300',
         // focus
         'focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none',
         // states
         isDisabled
-          ? 'cursor-not-allowed border-neutral-300 opacity-60'
+          ? 'cursor-not-allowed border-border opacity-60'
           : isError
-            ? 'border-rose-400 bg-rose-50/40 ring-2 ring-rose-500/20'
+            ? 'border-destructive bg-destructive/10 ring-2 ring-destructive/20'
             : isDrag
-              ? 'border-blue-400 bg-blue-50/50 ring-2 ring-blue-500/30'
-              : 'hover:border-neutral-400',
+              ? 'border-primary bg-primary/10 ring-2 ring-primary/20'
+              : 'hover:border-border/80',
         className,
       ].join(' ')}
     >
       {isError ? (
-        <AlertCircle aria-hidden className="mb-3 h-12 w-12 text-rose-500" />
+        <AlertCircle aria-hidden className="mb-3 h-12 w-12 text-destructive" />
       ) : (
         <Upload
           aria-hidden
           className={[
             'mb-3 h-12 w-12 transition-transform',
-            isDrag ? 'scale-110 text-blue-500' : 'text-neutral-400',
+            isDrag ? 'scale-110 text-primary' : 'text-muted-foreground',
           ].join(' ')}
         />
       )}
 
-      <p className="text-xl font-semibold text-neutral-800 dark:text-neutral-100">{label}</p>
-      <p id={`${id}-hint`} className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+      <p className="text-xl font-semibold text-foreground">{label}</p>
+      <p id={`${id}-hint`} className="mt-1 text-sm text-muted-foreground">
         {hint}
       </p>
 
       {/* playful dotted overlay */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 rounded-3xl"
+        className={[
+          'pointer-events-none absolute inset-0 rounded-3xl',
+          isError ? 'text-destructive' : isDrag ? 'text-primary' : 'text-muted-foreground',
+        ].join(' ')}
         style={{
           maskImage: 'radial-gradient(12px 12px at 12px 12px, transparent 10px, black 10px)',
           WebkitMaskImage: 'radial-gradient(12px 12px at 12px 12px, transparent 10px, black 10px)',
           backgroundImage: 'radial-gradient(currentColor 1px, transparent 1px)',
           backgroundSize: '16px 16px',
           opacity: isError ? 0.12 : isDrag ? 0.12 : 0.06,
-          color: isError ? 'rgb(244 63 94)' : 'rgb(59 130 246)', // rose-500 / blue-500
         }}
       />
 
