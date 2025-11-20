@@ -3,6 +3,8 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import SessionView from './SessionView';
 import type { ImageItem } from '@/types/core';
+import { TranslationProvider } from '@/i18n/TranslationProvider';
+import type { ReactNode } from 'react';
 
 const mockImage: ImageItem = {
   id: 'test-image-1',
@@ -30,6 +32,9 @@ const defaultProps = {
   hasMultipleImages: true,
 };
 
+const renderWithProviders = (ui: ReactNode) =>
+  render(<TranslationProvider>{ui}</TranslationProvider>);
+
 describe('SessionView keyboard shortcuts', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -41,7 +46,7 @@ describe('SessionView keyboard shortcuts', () => {
   });
 
   it('renders session view with image', () => {
-    render(<SessionView {...defaultProps} />);
+    renderWithProviders(<SessionView {...defaultProps} />);
 
     expect(screen.getByAltText('Test Image')).toBeInTheDocument();
     expect(screen.getByText('Test Image')).toBeInTheDocument();
@@ -49,7 +54,7 @@ describe('SessionView keyboard shortcuts', () => {
 
   it('calls onNext when N key is pressed', async () => {
     const user = userEvent.setup();
-    render(<SessionView {...defaultProps} />);
+    renderWithProviders(<SessionView {...defaultProps} />);
 
     const sessionView = screen.getByLabelText('Session view');
     sessionView.focus();
@@ -61,7 +66,7 @@ describe('SessionView keyboard shortcuts', () => {
 
   it('calls onPrev when P key is pressed', async () => {
     const user = userEvent.setup();
-    render(<SessionView {...defaultProps} />);
+    renderWithProviders(<SessionView {...defaultProps} />);
 
     const sessionView = screen.getByLabelText('Session view');
     sessionView.focus();
@@ -73,7 +78,7 @@ describe('SessionView keyboard shortcuts', () => {
 
   it('calls onPause when Space is pressed and session is not paused', async () => {
     const user = userEvent.setup();
-    render(<SessionView {...defaultProps} isPaused={false} />);
+    renderWithProviders(<SessionView {...defaultProps} isPaused={false} />);
 
     const sessionView = screen.getByLabelText('Session view');
     sessionView.focus();
@@ -86,7 +91,7 @@ describe('SessionView keyboard shortcuts', () => {
 
   it('calls onResume when Space is pressed and session is paused', async () => {
     const user = userEvent.setup();
-    render(<SessionView {...defaultProps} isPaused={true} />);
+    renderWithProviders(<SessionView {...defaultProps} isPaused={true} />);
 
     const sessionView = screen.getByLabelText('Session view');
     sessionView.focus();
@@ -99,7 +104,7 @@ describe('SessionView keyboard shortcuts', () => {
 
   it('does not trigger shortcuts when focus is not within session view', async () => {
     const user = userEvent.setup();
-    render(<SessionView {...defaultProps} />);
+    renderWithProviders(<SessionView {...defaultProps} />);
 
     // Focus outside the session view by clicking on body
     await user.click(document.body);
@@ -111,7 +116,7 @@ describe('SessionView keyboard shortcuts', () => {
 
   it('does not trigger shortcuts when typing in editable elements', async () => {
     const user = userEvent.setup();
-    render(
+    renderWithProviders(
       <div>
         <input data-testid="test-input" />
         <SessionView {...defaultProps} />
@@ -127,7 +132,7 @@ describe('SessionView keyboard shortcuts', () => {
 
   it('allows Space to work on pause button with data-session-shortcut attribute', async () => {
     const user = userEvent.setup();
-    render(<SessionView {...defaultProps} isPaused={false} />);
+    renderWithProviders(<SessionView {...defaultProps} isPaused={false} />);
 
     const pauseButton = screen.getByLabelText('Pause session');
     pauseButton.focus();
@@ -138,7 +143,7 @@ describe('SessionView keyboard shortcuts', () => {
   });
 
   it('shows keyboard shortcuts hint', () => {
-    render(<SessionView {...defaultProps} />);
+    renderWithProviders(<SessionView {...defaultProps} />);
 
     // Check that all shortcut hints are present (may appear multiple times)
     expect(screen.getAllByText(/pause\/resume/i).length).toBeGreaterThan(0);
@@ -148,7 +153,7 @@ describe('SessionView keyboard shortcuts', () => {
   });
 
   it('updates fullscreen hint text when in fullscreen', async () => {
-    const { container } = render(<SessionView {...defaultProps} />);
+    const { container } = renderWithProviders(<SessionView {...defaultProps} />);
 
     // Initially should show "fullscreen" not "exit fullscreen"
     expect(screen.getByText(/fullscreen/i)).toBeInTheDocument();
@@ -172,7 +177,7 @@ describe('SessionView keyboard shortcuts', () => {
   });
 
   it('shows "Keyboard shortcuts active" when focus is within view', () => {
-    render(<SessionView {...defaultProps} />);
+    renderWithProviders(<SessionView {...defaultProps} />);
 
     const sessionView = screen.getByLabelText('Session view');
     sessionView.focus();
@@ -181,7 +186,7 @@ describe('SessionView keyboard shortcuts', () => {
   });
 
   it('shows focus state hint text', () => {
-    render(<SessionView {...defaultProps} />);
+    renderWithProviders(<SessionView {...defaultProps} />);
 
     // Component auto-focuses on mount, so "Keyboard shortcuts active" should be visible
     // The conditional rendering ensures one of the two texts is always shown
@@ -194,7 +199,7 @@ describe('SessionView keyboard shortcuts', () => {
 
   it('handles multiple key presses in sequence', async () => {
     const user = userEvent.setup();
-    render(<SessionView {...defaultProps} />);
+    renderWithProviders(<SessionView {...defaultProps} />);
 
     const sessionView = screen.getByLabelText('Session view');
     sessionView.focus();
@@ -208,7 +213,7 @@ describe('SessionView keyboard shortcuts', () => {
   });
 
   it('prevents default behavior for shortcut keys', async () => {
-    render(<SessionView {...defaultProps} />);
+    renderWithProviders(<SessionView {...defaultProps} />);
 
     const sessionView = screen.getByLabelText('Session view');
     sessionView.focus();

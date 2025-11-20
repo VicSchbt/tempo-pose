@@ -6,8 +6,10 @@ import { useSessionClock } from '@/hooks/useSessionClock';
 import { resolveTimerDurationMs } from '@/lib/timer';
 import type { TimerPresetId } from '@/types/core';
 import SessionView from '@/components/session/SessionView';
+import { useTranslation } from '@/i18n/TranslationProvider';
 
 export default function SessionPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const images = useStore((s) => s.images);
   const sessionQueue = useStore((s) => s.sessionQueue);
@@ -44,8 +46,8 @@ export default function SessionPage() {
   if (!isActive || sessionQueue.length === 0) {
     return (
       <div className="flex h-svh flex-col items-center justify-center gap-4">
-        <p className="text-muted-foreground text-lg">No active session</p>
-        <Button onClick={() => navigate('/')}>Go to Home</Button>
+        <p className="text-muted-foreground text-lg">{t('session.noActive')}</p>
+        <Button onClick={() => navigate('/')}>{t('session.goHome')}</Button>
       </div>
     );
   }
@@ -81,8 +83,8 @@ export default function SessionPage() {
   if (!currentImage) {
     return (
       <div className="flex h-svh flex-col items-center justify-center gap-4">
-        <p className="text-muted-foreground text-lg">Image not found</p>
-        <Button onClick={() => navigate('/')}>Go to Home</Button>
+        <p className="text-muted-foreground text-lg">{t('session.imageMissing')}</p>
+        <Button onClick={() => navigate('/')}>{t('session.goHome')}</Button>
       </div>
     );
   }

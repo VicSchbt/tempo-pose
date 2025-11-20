@@ -12,6 +12,7 @@ import { DropSurface } from './DropSurface';
 import { useDragDrop } from './useDragDrop';
 import { toast } from 'sonner';
 import { dedupeFiles } from '@/utils/fileDedup';
+import { useTranslation } from '@/i18n/TranslationProvider';
 
 type ImageDropProps = {
   accept?: string; // e.g. "image/*,.png,.jpg,.jpeg,.webp"
@@ -29,13 +30,14 @@ export default function ImageDrop({
   multiple = true,
   disabled = false,
   maxSizeMB = 10,
-  label = 'Drag & drop images here, or click to select',
+  label,
   id = 'image-drop-input',
   className = '',
   onValidationIssues,
 }: ImageDropProps) {
   const addImages = useStore((s) => s.addImages);
   const inputRef = useRef<HTMLInputElement>(null);
+  const { t } = useTranslation();
 
   const acceptPredicate = useMemo(() => makeAcceptPredicate(accept), [accept]);
   const maxBytes = useMemo(() => maxSizeMB * 1024 * 1024, [maxSizeMB]);
@@ -49,7 +51,8 @@ export default function ImageDrop({
 
       // 🧩 2. Warn user if any duplicate found
       if (duplicatesCount > 0) {
-        toast.info(`${duplicatesCount} duplicate file${duplicatesCount > 1 ? 's' : ''} ignored`, {
+        const key = duplicatesCount === 1 ? 'toasts.duplicateSingle' : 'toasts.duplicatePlural';
+        toast.info(t(key, { count: duplicatesCount }), {
           duration: 4000,
           position: 'top-right',
         });
@@ -64,8 +67,13 @@ export default function ImageDrop({
       if (issues.length) {
         const messages = [
           ...new Set(
-            issues.map((i) =>
-              i.reason === 'size' ? `${i.message} (max ${formatBytes(maxBytes)})` : i.message,
+            issues.map((issue) =>
+              issue.reason === 'size'
+                ? t('toasts.validationSize', {
+                    file: issue.file.name,
+                    size: formatBytes(issue.file.size),
+                  })
+                : t('toasts.validationType', { file: issue.file.name }),
             ),
           ),
         ];
@@ -78,10 +86,15 @@ export default function ImageDrop({
         });
 
         if (messages.length > 5) {
-          toast.error(`+${messages.length - 5} more issues`, {
-            duration: 4000,
-            position: 'top-right',
-          });
+          toast.error(
+            t('toasts.validationOverflow', {
+              count: messages.length - 5,
+            }),
+            {
+              duration: 4000,
+              position: 'top-right',
+            },
+          );
         }
 
         onValidationIssues?.(messages);
@@ -125,8 +138,12 @@ export default function ImageDrop({
 
       <DropSurface
         id={id}
-        label={label}
-        hint={`${multiple ? 'Multiple files • ' : ''}Accepted: ${accept} • Max size: ${formatBytes(maxBytes)}`}
+        label={label ?? t('images.drop.label')}
+        hint={
+          multiple
+            ? t('images.drop.hintMultiple', { accept, size: formatBytes(maxBytes) })
+            : t('images.drop.hintSingle', { accept, size: formatBytes(maxBytes) })
+        }
         state={disabled ? 'disabled' : drag.isDragging ? 'drag' : 'idle'}
         className={className}
         onClick={openDialog}
@@ -144,7 +161,7 @@ export default function ImageDrop({
       >
         {/* a11y live region */}
         <span className="sr-only" aria-live="polite">
-          {drag.isDragging ? 'Drop files now' : 'Drop zone ready'}
+          {drag.isDragging ? t('images.drop.dropNow') : t('images.drop.ready')}
         </span>
       </DropSurface>
     </div>

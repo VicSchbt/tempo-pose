@@ -15,39 +15,40 @@ import {
   SlidersHorizontalIcon,
   Share2Icon,
 } from 'lucide-react';
+import { useTranslation } from '@/i18n/TranslationProvider';
 
 const STORAGE_KEY = 'tempoPose.helpDialogDismissed';
 
 const helpSteps = [
   {
     icon: ImageIcon,
-    title: 'Pick a pose',
-    description: 'Browse the library or upload your own image to start.',
+    key: 'pickPose',
   },
   {
     icon: Music2Icon,
-    title: 'Set the tempo',
-    description: 'Drag the BPM slider or tap tempo to sync every animation.',
+    key: 'setTempo',
   },
   {
     icon: PlayCircleIcon,
-    title: 'Preview moves',
-    description: 'Scrub the timeline and toggle layers to isolate motions.',
+    key: 'previewMoves',
   },
   {
     icon: SlidersHorizontalIcon,
-    title: 'Fine-tune cues',
-    description: 'Adjust easing, delays, and loop counts for smooth transitions.',
+    key: 'fineTune',
   },
   {
     icon: Share2Icon,
-    title: 'Export & share',
-    description: 'Download the sequence or copy a link when you are ready.',
+    key: 'exportShare',
   },
 ] as const;
 
+type HelpStepKey = (typeof helpSteps)[number]['key'];
+type HelpStepTitleKey = `dialogs.help.steps.${HelpStepKey}.title`;
+type HelpStepDescriptionKey = `dialogs.help.steps.${HelpStepKey}.description`;
+
 export default function FirstTimeHelpDialog() {
   const [isOpen, setIsOpen] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (typeof window === 'undefined') {
@@ -71,29 +72,33 @@ export default function FirstTimeHelpDialog() {
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Quick start guide</DialogTitle>
-          <DialogDescription>
-            Five pointers to help you get the most out of Tempo Pose right away.
-          </DialogDescription>
+          <DialogTitle>{t('dialogs.help.title')}</DialogTitle>
+          <DialogDescription>{t('dialogs.help.description')}</DialogDescription>
         </DialogHeader>
 
         <ol className="space-y-4">
-          {helpSteps.map((step) => (
-            <li key={step.title} className="flex items-start gap-4">
-              <span className="bg-muted text-muted-foreground flex size-10 items-center justify-center rounded-full">
-                <step.icon className="size-5" aria-hidden />
-              </span>
-              <div className="space-y-1">
-                <p className="font-medium">{step.title}</p>
-                <p className="text-muted-foreground text-sm">{step.description}</p>
-              </div>
-            </li>
-          ))}
+          {helpSteps.map((step) => {
+            const title = t(`dialogs.help.steps.${step.key}.title` as HelpStepTitleKey);
+            const description = t(
+              `dialogs.help.steps.${step.key}.description` as HelpStepDescriptionKey,
+            );
+            return (
+              <li key={step.key} className="flex items-start gap-4">
+                <span className="bg-muted text-muted-foreground flex size-10 items-center justify-center rounded-full">
+                  <step.icon className="size-5" aria-hidden />
+                </span>
+                <div className="space-y-1">
+                  <p className="font-medium">{title}</p>
+                  <p className="text-muted-foreground text-sm">{description}</p>
+                </div>
+              </li>
+            );
+          })}
         </ol>
 
         <DialogFooter>
           <Button className="mt-4 w-full" onClick={() => handleOpenChange(false)}>
-            Got it
+            {t('dialogs.help.dismiss')}
           </Button>
         </DialogFooter>
       </DialogContent>

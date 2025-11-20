@@ -152,19 +152,25 @@ describe('fullscreen utilities', () => {
   });
 
   describe('getFullscreenHint', () => {
+    const labels = {
+      unsupported: 'unsupported',
+      enter: 'enter',
+      exit: 'exit',
+    };
+
     it('returns unsupported message when fullscreen is not supported', () => {
-      const hint = getFullscreenHint(false, false);
-      expect(hint).toBe('fullscreen not supported (use device gesture on iOS)');
+      const hint = getFullscreenHint(false, false, labels);
+      expect(hint).toBe(labels.unsupported);
     });
 
     it('returns "fullscreen" when not in fullscreen and supported', () => {
-      const hint = getFullscreenHint(false, true);
-      expect(hint).toBe('fullscreen');
+      const hint = getFullscreenHint(false, true, labels);
+      expect(hint).toBe(labels.enter);
     });
 
     it('returns "exit fullscreen" when in fullscreen and supported', () => {
-      const hint = getFullscreenHint(true, true);
-      expect(hint).toBe('exit fullscreen');
+      const hint = getFullscreenHint(true, true, labels);
+      expect(hint).toBe(labels.exit);
     });
   });
 });
