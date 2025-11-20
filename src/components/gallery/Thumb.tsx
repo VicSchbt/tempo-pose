@@ -106,7 +106,7 @@ export const Thumb = React.memo(function Thumb({
   return (
     <li
       role="listitem"
-      className="group relative overflow-hidden rounded-xl border bg-white shadow-sm focus-within:ring-2 focus-within:ring-offset-2"
+      className="group relative overflow-hidden rounded-xl border border-border bg-card shadow-sm focus-within:ring-2 focus-within:ring-offset-2"
     >
       {/* image */}
       <img
@@ -131,7 +131,7 @@ export const Thumb = React.memo(function Thumb({
           onClick={overlayAction}
           className="absolute inset-0 inline-flex items-center justify-center bg-black/45 text-white backdrop-blur-[1px] transition-colors hover:bg-black/55 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
         >
-          <span className="rounded-full bg-white/90 px-3 py-1 text-sm font-semibold text-neutral-900 shadow">
+          <span className="rounded-full bg-card px-3 py-1 text-sm font-semibold text-card-foreground shadow">
             {overlayLabel}
           </span>
         </button>

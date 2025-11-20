@@ -46,7 +46,7 @@ export default function ImageGrid() {
   if (!images || images.length === 0) {
     return (
       <div
-        className="mx-auto mt-6 w-full max-w-5xl rounded-2xl border border-dashed p-6 text-center text-neutral-600"
+        className="mx-auto mt-6 w-full max-w-5xl rounded-2xl border border-dashed border-border bg-muted/50 p-6 text-center text-muted-foreground"
         role="status"
         aria-live="polite"
       >
@@ -59,7 +59,7 @@ export default function ImageGrid() {
     <section className="mx-auto mt-6 w-full max-w-5xl">
       <header className="mb-3 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
-          <h2 className="text-lg font-semibold text-neutral-900">Gallery</h2>
+          <h2 className="text-lg font-semibold text-foreground">Gallery</h2>
           {/* Total images */}
           <CountBadge
             count={total}
@@ -111,7 +111,7 @@ export default function ImageGrid() {
         {expanded && canCollapse && (
           <li
             role="listitem"
-            className="group relative flex items-center justify-center overflow-hidden rounded-xl border bg-neutral-100 shadow-sm transition focus-within:ring-2 focus-within:ring-offset-2 hover:bg-neutral-200"
+            className="group relative flex items-center justify-center overflow-hidden rounded-xl border border-border bg-muted shadow-sm transition focus-within:ring-2 focus-within:ring-offset-2 hover:bg-muted/80"
           >
             <Button
               variant="outline"
