@@ -20,10 +20,12 @@ const defaultProps = {
   progressPercentage: 50,
   remainingSeconds: 30,
   isPaused: false,
+  isMuted: false,
   onPrev: vi.fn(),
   onNext: vi.fn(),
   onPause: vi.fn(),
   onResume: vi.fn(),
+  onToggleMute: vi.fn(),
   onEndSession: vi.fn(),
   hasMultipleImages: true,
 };
