@@ -45,3 +45,10 @@
 
 ## 2025-11-20
 - No commits found
+
+
+## 2025-11-20
+- refactor(gallery): TEMPO-76 - update styles for ImageGrid, Thumb, and DropSurface components to enhance visual consistency (a2574a8)
+- feat(theme): TEMPO-75 - add storageKey prop to NextThemesProvider for theme persistence (caa9a14)
+- feat(theme): TEMPO-74 - implement theme toggle functionality and integrate ThemeProvider (39caa7f)
+- chore(changelog): add entry for v1.2.0 found (2dd6d4b)
