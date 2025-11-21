@@ -1,6 +1,6 @@
-import type { EnTranslation } from './en';
+import type { TranslationSchema } from './en';
 
-const frTranslation: EnTranslation = {
+const frTranslation = {
   app: {
     name: 'Tempo Pose',
   },
@@ -21,22 +21,22 @@ const frTranslation: EnTranslation = {
     toggle: 'Changer de thème',
   },
   home: {
-    sessionHeading: 'Séance',
+    sessionHeading: 'Session',
     galleryHeading: 'Galerie',
   },
   session: {
-    controlsAria: 'Contrôles de séance',
-    heading: 'Séance',
-    start: 'Lancer la séance',
-    needImages: 'Ajoutez au moins une image avant de démarrer une séance',
-    noActive: 'Aucune séance en cours',
+    controlsAria: 'Contrôles de session',
+    heading: 'Session',
+    start: 'Lancer la session',
+    needImages: 'Ajoutez au moins une image avant de démarrer une session',
+    noActive: 'Aucune session en cours',
     goHome: 'Retour à l’accueil',
     imageMissing: 'Image introuvable',
     view: {
-      ariaLabel: 'Vue de séance',
+      ariaLabel: 'Vue de session',
       keyboardActive: 'Raccourcis clavier actifs',
       keyboardInactive: 'Cliquez pour activer les raccourcis clavier',
-      end: 'Terminer la séance',
+      end: 'Terminer la session',
       progress: 'Progression :',
       remaining: 'Restant :',
       nextImageIn: 'Prochaine image dans :',
@@ -121,19 +121,16 @@ const frTranslation: EnTranslation = {
       steps: {
         pickPose: {
           title: 'Choisir une pose',
-          description: 'Parcourez la bibliothèque ou importez vos images.',
+          description: 'Parcourez vos fichiers ou importez vos images.',
         },
         setTempo: {
           title: 'Régler le tempo',
-          description: 'Ajustez le BPM ou tapez le tempo pour synchroniser.',
+          description: 'Ajustez le BPM ou tapez le temps de votre choix.',
         },
         previewMoves: {
-          title: 'Prévisualiser les mouvements',
-          description: 'Balayez la timeline et isolez les calques voulus.',
-        },
-        fineTune: {
-          title: 'Ajuster les repères',
-          description: 'Modifiez les ralentis, délais et boucles pour fluidifier.',
+          title: 'Prévisualiser vos images',
+          description:
+            'Balayez la timeline et supprimez les calques que vous ne souhaitez pas voir.',
         },
         exportShare: {
           title: 'Exporter et partager',
@@ -174,7 +171,6 @@ const frTranslation: EnTranslation = {
     statsAverage: 'Moyenne par image',
     backHome: 'Retour à l’accueil',
   },
-} as const;
+} as const satisfies TranslationSchema;
 
 export default frTranslation;
-

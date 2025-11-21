@@ -8,13 +8,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import {
-  ImageIcon,
-  Music2Icon,
-  PlayCircleIcon,
-  SlidersHorizontalIcon,
-  Share2Icon,
-} from 'lucide-react';
+import { ImageIcon, Music2Icon, PlayCircleIcon, Share2Icon } from 'lucide-react';
 import { useTranslation } from '@/i18n/TranslationProvider';
 
 const STORAGE_KEY = 'tempoPose.helpDialogDismissed';
@@ -31,10 +25,6 @@ const helpSteps = [
   {
     icon: PlayCircleIcon,
     key: 'previewMoves',
-  },
-  {
-    icon: SlidersHorizontalIcon,
-    key: 'fineTune',
   },
   {
     icon: Share2Icon,

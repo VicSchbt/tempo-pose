@@ -129,13 +129,9 @@ const enTranslation = {
           title: 'Preview moves',
           description: 'Scrub the timeline and toggle layers to isolate motions.',
         },
-        fineTune: {
-          title: 'Fine-tune cues',
-          description: 'Adjust easing, delays, and loop counts for smooth transitions.',
-        },
         exportShare: {
           title: 'Export & share',
-          description: 'Download the sequence or copy a link when you are ready.',
+          description: 'Download the sequence stats or copy a link when you are ready.',
         },
       },
       dismiss: 'Got it',
@@ -174,6 +170,7 @@ const enTranslation = {
   },
 } as const;
 
-export type EnTranslation = typeof enTranslation;
-export default enTranslation;
+type DeepString<T> = T extends string ? string : { [K in keyof T]: DeepString<T[K]> };
 
+export type TranslationSchema = DeepString<typeof enTranslation>;
+export default enTranslation;

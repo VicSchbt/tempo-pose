@@ -1,13 +1,16 @@
-import enTranslation, { type EnTranslation } from './locales/en';
+import enTranslation, { type TranslationSchema } from './locales/en';
 import frTranslation from './locales/fr';
 
-export const translations = {
+const localeTranslations = {
   en: enTranslation,
   fr: frTranslation,
 } as const;
 
-export type Locale = keyof typeof translations;
-export type Translation = EnTranslation;
+export type Locale = keyof typeof localeTranslations;
+
+export const translations: Record<Locale, TranslationSchema> = localeTranslations;
+export type Translation = typeof enTranslation;
+export type { TranslationSchema } from './locales/en';
 
 type Join<K extends string, P extends string> = `${K}.${P}`;
 type LeafKeys<T> = {

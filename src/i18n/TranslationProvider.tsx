@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import {
   translations,
   type Locale,
-  type Translation,
+  type TranslationSchema,
   type TranslationKey,
   type TranslationParams,
 } from './translations';
@@ -23,7 +23,7 @@ type TranslationProviderProps = {
   children: ReactNode;
 };
 
-function resolveKey(dictionary: Translation, key: TranslationKey): string {
+function resolveKey(dictionary: TranslationSchema, key: TranslationKey): string {
   const segments = key.split('.');
   let current: unknown = dictionary;
 
