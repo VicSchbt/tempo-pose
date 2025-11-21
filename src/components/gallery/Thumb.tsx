@@ -94,10 +94,9 @@ export const Thumb = React.memo(function Thumb({
               type="button"
               size="sm"
               variant="outline"
-              className="h-7 px-2 text-xs"
               onClick={() => onRemove(img.id)}
             >
-              {t('images.thumb.remove')}
+              <span className="text-xs">{t('images.thumb.remove')}</span>
             </Button>
           )}
         </div>

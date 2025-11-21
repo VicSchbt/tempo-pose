@@ -86,6 +86,10 @@ export default function FirstTimeHelpDialog() {
           })}
         </ol>
 
+        <p className="text-muted-foreground text-sm mt-2">
+          {t('dialogs.help.keepScreenAwakeHint')}
+        </p>
+
         <DialogFooter>
           <Button className="mt-4 w-full" onClick={() => handleOpenChange(false)}>
             {t('dialogs.help.dismiss')}

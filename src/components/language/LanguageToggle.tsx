@@ -10,7 +10,7 @@ export function LanguageToggle() {
       </label>
       <select
         id="language-toggle"
-        className="border-input bg-background text-foreground focus-visible:ring-ring focus-visible:ring-offset-background h-9 rounded-md border px-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+        className="border-input bg-background text-foreground focus-visible:ring-ring focus-visible:ring-offset-background h-11 min-h-11 min-w-11 rounded-md border px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
         value={locale}
         onChange={(event) => setLocale(event.target.value as Locale)}
         aria-label={t('languageSwitch.label')}

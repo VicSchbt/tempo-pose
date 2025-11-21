@@ -21,7 +21,7 @@ export function TimerHelpTooltip() {
           <button
             type="button"
             aria-label={label}
-            className="border-border text-muted-foreground hover:bg-muted focus-visible:ring-ring focus-visible:ring-offset-background inline-flex h-6 w-6 items-center justify-center rounded-full border focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+            className="border-border text-muted-foreground hover:bg-muted focus-visible:ring-ring focus-visible:ring-offset-background inline-flex size-11 items-center justify-center rounded-full border focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
           >
             <Info className="h-3.5 w-3.5" aria-hidden="true" />
           </button>
