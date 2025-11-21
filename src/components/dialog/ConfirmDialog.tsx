@@ -10,6 +10,7 @@ import {
   DialogClose,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/TranslationProvider';
 
 type ConfirmDialogProps = {
   open: boolean;
@@ -31,15 +32,21 @@ type ConfirmDialogProps = {
  */
 export function ConfirmDialog({
   open,
-  title = 'Are you sure?',
-  description = 'This action cannot be undone.',
-  confirmLabel = 'Confirm',
-  cancelLabel = 'Cancel',
+  title,
+  description,
+  confirmLabel,
+  cancelLabel,
   tone = 'danger',
   onConfirm,
   onOpenChange,
   returnFocus,
 }: ConfirmDialogProps) {
+  const { t } = useTranslation();
+  const resolvedTitle = title ?? t('dialogs.confirm.title');
+  const resolvedDescription = description ?? t('dialogs.confirm.description');
+  const resolvedConfirmLabel = confirmLabel ?? t('dialogs.confirm.confirm');
+  const resolvedCancelLabel = cancelLabel ?? t('dialogs.confirm.cancel');
+
   // Restore focus to trigger after closing
   React.useEffect(() => {
     if (!open) returnFocus?.();
@@ -56,14 +63,14 @@ export function ConfirmDialog({
                 tone === 'danger' ? 'text-destructive h-5 w-5' : 'text-muted-foreground h-5 w-5'
               }
             />
-            <DialogTitle className="leading-none">{title}</DialogTitle>
+            <DialogTitle className="leading-none">{resolvedTitle}</DialogTitle>
           </div>
-          <DialogDescription>{description}</DialogDescription>
+          <DialogDescription>{resolvedDescription}</DialogDescription>
         </DialogHeader>
 
         <DialogFooter className="gap-2">
           <DialogClose asChild>
-            <Button variant="outline">{cancelLabel}</Button>
+            <Button variant="outline">{resolvedCancelLabel}</Button>
           </DialogClose>
 
           <Button
@@ -73,7 +80,7 @@ export function ConfirmDialog({
               onOpenChange(false);
             }}
           >
-            {confirmLabel}
+            {resolvedConfirmLabel}
           </Button>
         </DialogFooter>
       </DialogContent>

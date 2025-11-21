@@ -37,10 +37,20 @@ export function isFullscreenSupported(): boolean {
 /**
  * Gets the appropriate fullscreen hint text based on platform support
  */
-export function getFullscreenHint(isFullscreen: boolean, isSupported: boolean): string {
+export type FullscreenHintLabels = {
+  unsupported: string;
+  enter: string;
+  exit: string;
+};
+
+export function getFullscreenHint(
+  isFullscreen: boolean,
+  isSupported: boolean,
+  labels: FullscreenHintLabels,
+): string {
   if (!isSupported) {
-    return 'fullscreen not supported (use device gesture on iOS)';
+    return labels.unsupported;
   }
 
-  return isFullscreen ? 'exit fullscreen' : 'fullscreen';
+  return isFullscreen ? labels.exit : labels.enter;
 }

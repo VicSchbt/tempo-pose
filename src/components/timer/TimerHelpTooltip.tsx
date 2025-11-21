@@ -3,14 +3,16 @@
 import { Info } from 'lucide-react';
 import { useStore } from '@/store';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useTranslation } from '@/i18n/TranslationProvider';
 
 export function TimerHelpTooltip() {
   const preset = useStore((s) => s.preset);
   const customSeconds = useStore((s) => s.customSeconds);
+  const { t } = useTranslation();
 
   const seconds = preset ?? customSeconds ?? 60;
 
-  const label = `Image advances every ${seconds} seconds.`;
+  const label = t('timer.tooltip', { seconds });
 
   return (
     <TooltipProvider delayDuration={200}>

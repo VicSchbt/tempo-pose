@@ -12,6 +12,7 @@ import {
   isButtonLikeElement,
 } from '@/utils/keyboardShortcuts';
 import { getFullscreenHint, isFullscreenSupported } from '@/utils/fullscreen';
+import { useTranslation } from '@/i18n/TranslationProvider';
 
 type SessionViewProps = {
   currentImage: ImageItem;
@@ -48,6 +49,7 @@ export default function SessionView({
   onEndSession,
   hasMultipleImages,
 }: SessionViewProps) {
+  const { t } = useTranslation();
   const rootRef = useRef<HTMLDivElement>(null);
   const [hasFocusWithin, setHasFocusWithin] = useState(false);
   const [isWindowFocused, setIsWindowFocused] = useState(() => {
@@ -218,6 +220,15 @@ export default function SessionView({
     };
   }, [shortcutsEnabled, codeShortcutMap, keyShortcutMap]);
 
+  const fullscreenHintLabels = useMemo(
+    () => ({
+      unsupported: t('fullscreen.unsupported'),
+      enter: t('fullscreen.enter'),
+      exit: t('fullscreen.exit'),
+    }),
+    [t],
+  );
+
   return (
     <div
       ref={rootRef}
@@ -226,20 +237,18 @@ export default function SessionView({
       className="bg-background text-foreground flex h-svh flex-col overflow-hidden outline-none"
       onFocusCapture={handleFocusCapture}
       onBlurCapture={handleBlurCapture}
-      aria-label="Session view"
+      aria-label={t('session.view.ariaLabel')}
     >
       <div className="border-border bg-background shrink-0 border-b">
         <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
           <div className="flex flex-col">
-            <h1 className="text-lg font-semibold tracking-tight">Tempo Pose</h1>
+            <h1 className="text-lg font-semibold tracking-tight">{t('app.name')}</h1>
             <span className="text-muted-foreground text-xs">
-              {shortcutsEnabled
-                ? 'Keyboard shortcuts active'
-                : 'Click to enable keyboard shortcuts'}
+              {shortcutsEnabled ? t('session.view.keyboardActive') : t('session.view.keyboardInactive')}
             </span>
           </div>
           <Button variant="outline" size="sm" onClick={onEndSession}>
-            End Session
+            {t('session.view.end')}
           </Button>
         </div>
       </div>
@@ -248,24 +257,27 @@ export default function SessionView({
         <div className="shrink-0 space-y-3 pb-3">
           <div className="flex items-center justify-between">
             <div className="text-muted-foreground text-sm">
-              Progress:{' '}
+              {t('session.view.progress')}{' '}
               <span className="font-medium">
                 {currentPosition}/{totalImages}
               </span>
             </div>
             <div className="text-muted-foreground text-sm">
-              Remaining: <span className="font-medium">{remainingCount}</span>
+              {t('session.view.remaining')}{' '}
+              <span className="font-medium">{remainingCount}</span>
             </div>
           </div>
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-muted-foreground text-xs">
-                Next image in:{' '}
+                {t('session.view.nextImageIn')}{' '}
                 <span className="font-medium">{formatTimeFromSeconds(remainingSeconds)}</span>
               </span>
               {isPaused && (
-                <span className="text-muted-foreground text-xs font-medium">Paused</span>
+                <span className="text-muted-foreground text-xs font-medium">
+                  {t('session.view.paused')}
+                </span>
               )}
             </div>
             <div className="bg-muted h-2 w-full overflow-hidden rounded-full">
@@ -276,7 +288,7 @@ export default function SessionView({
                 aria-valuenow={normalizedProgress}
                 aria-valuemin={0}
                 aria-valuemax={100}
-                aria-label="Interval progress"
+                aria-label={t('accessibility.intervalProgress')}
               />
             </div>
           </div>
@@ -286,36 +298,36 @@ export default function SessionView({
           <div className="flex flex-1 items-center justify-center overflow-hidden">
             <img
               src={currentImage.url}
-              alt={currentImage.name ?? 'Reference image'}
+              alt={currentImage.name ?? t('session.view.referenceFallback')}
               className="max-h-full max-w-full rounded object-contain"
             />
           </div>
           <figcaption className="text-muted-foreground shrink-0 pt-2 text-center text-sm">
-            {currentImage.name ?? 'Image'}
+            {currentImage.name ?? t('session.view.imageFallback')}
           </figcaption>
         </figure>
 
         <div className="shrink-0 pt-4">
           <div className="flex items-center justify-center gap-4">
             <Button variant="outline" onClick={onPrev} disabled={!hasMultipleImages}>
-              Previous
+              {t('session.view.previous')}
             </Button>
             <Button
               variant={isPaused ? 'default' : 'outline'}
               onClick={handleTogglePause}
-              aria-label={isPaused ? 'Resume session' : 'Pause session'}
+              aria-label={isPaused ? t('accessibility.resumeSession') : t('accessibility.pauseSession')}
               data-session-shortcut="pause"
             >
-              {isPaused ? 'Resume' : 'Pause'}
+              {isPaused ? t('session.view.resume') : t('session.view.pause')}
             </Button>
             <Button variant="outline" onClick={onNext} disabled={!hasMultipleImages}>
-              Next
+              {t('session.view.next')}
             </Button>
             <Button
               variant="outline"
               size="icon"
               onClick={onToggleMute}
-              aria-label={isMuted ? 'Unmute sounds' : 'Mute sounds'}
+              aria-label={isMuted ? t('accessibility.unmute') : t('accessibility.mute')}
             >
               {isMuted ? (
                 <VolumeX className="h-4 w-4" aria-hidden="true" />
@@ -328,7 +340,9 @@ export default function SessionView({
                 variant="outline"
                 size="icon"
                 onClick={toggleFullscreen}
-                aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+                aria-label={
+                  isFullscreen ? t('accessibility.exitFullscreen') : t('accessibility.enterFullscreen')
+                }
               >
                 {isFullscreen ? (
                   <Minimize className="h-4 w-4" aria-hidden="true" />
@@ -344,26 +358,26 @@ export default function SessionView({
                 <Badge variant="secondary" className="font-mono text-[10px] uppercase">
                   Space
                 </Badge>
-                <span>pause/resume</span>
+                <span>{t('session.view.badges.pause')}</span>
               </span>
               <span className="flex items-center gap-1.5">
                 <Badge variant="secondary" className="font-mono text-[10px] uppercase">
                   N
                 </Badge>
-                <span>next</span>
+                <span>{t('session.view.badges.next')}</span>
               </span>
               <span className="flex items-center gap-1.5">
                 <Badge variant="secondary" className="font-mono text-[10px] uppercase">
                   P
                 </Badge>
-                <span>prev</span>
+                <span>{t('session.view.badges.prev')}</span>
               </span>
               {fullscreenSupported && (
                 <span className="flex items-center gap-1.5">
                   <Badge variant="secondary" className="font-mono text-[10px] uppercase">
                     F
                   </Badge>
-                  <span>{getFullscreenHint(isFullscreen, fullscreenSupported)}</span>
+                  <span>{getFullscreenHint(isFullscreen, fullscreenSupported, fullscreenHintLabels)}</span>
                 </span>
               )}
             </div>

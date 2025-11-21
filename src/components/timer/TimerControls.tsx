@@ -7,14 +7,17 @@ import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { TimerHelpTooltip } from './TimerHelpTooltip';
+import { useTranslation } from '@/i18n/TranslationProvider';
 
-const PRESETS: { id: TimerPresetId; label: string; seconds: TimerPreset | null }[] = [
-  { id: '30s', label: '30s', seconds: 30 },
-  { id: '60s', label: '1m', seconds: 60 },
-  { id: '2m', label: '2m', seconds: 120 },
-  { id: '5m', label: '5m', seconds: 300 },
-  { id: 'custom', label: 'Custom', seconds: null },
+const PRESETS: { id: TimerPresetId; seconds: TimerPreset | null }[] = [
+  { id: '30s', seconds: 30 },
+  { id: '60s', seconds: 60 },
+  { id: '2m', seconds: 120 },
+  { id: '5m', seconds: 300 },
+  { id: 'custom', seconds: null },
 ];
+
+type PresetTranslationKey = `timer.presets.${TimerPresetId}`;
 
 const MIN_SECONDS = 1;
 const MAX_SECONDS = 600;
@@ -26,6 +29,7 @@ export default function TimerControls() {
   const setCustomSeconds = useStore((s) => s.setCustomSeconds);
   const [validationError, setValidationError] = useState<string | null>(null);
   const [timeInput, setTimeInput] = useState<string>('');
+  const { t } = useTranslation();
 
   // Which preset is currently selected?
   const selectedId: TimerPresetId =
@@ -76,20 +80,23 @@ export default function TimerControls() {
     const totalSeconds = parseTimeToSeconds(value);
 
     if (totalSeconds === null) {
-      setValidationError('Please enter time in mm:ss format (e.g., 4:30)');
+      setValidationError(t('timer.validation.format'));
       setCustomSeconds(null);
       return;
     }
 
     if (totalSeconds < MIN_SECONDS) {
-      setValidationError(`Minimum value is ${formatTimeFromSeconds(MIN_SECONDS)}`);
+      setValidationError(t('timer.validation.min', { value: formatTimeFromSeconds(MIN_SECONDS) }));
       setCustomSeconds(null);
       return;
     }
 
     if (totalSeconds > MAX_SECONDS) {
       setValidationError(
-        `Maximum value is ${formatTimeFromSeconds(MAX_SECONDS)} (${MAX_SECONDS / 60} minutes)`,
+        t('timer.validation.max', {
+          value: formatTimeFromSeconds(MAX_SECONDS),
+          minutes: MAX_SECONDS / 60,
+        }),
       );
       setCustomSeconds(null);
       return;
@@ -100,11 +107,11 @@ export default function TimerControls() {
   };
 
   return (
-    <section aria-label="Timer controls" className="flex w-full flex-col gap-3">
+    <section aria-label={t('timer.sectionAria')} className="flex w-full flex-col gap-3">
       <header className="flex items-center justify-between gap-2">
         <div className="flex flex-col gap-1">
           <h2 id="timer-section-title" className="text-xl font-semibold">
-            Timer
+            {t('timer.heading')}
           </h2>
         </div>
 
@@ -113,24 +120,25 @@ export default function TimerControls() {
       </header>
       <div
         role="radiogroup"
-        aria-label="Timer presets"
+        aria-label={t('timer.presetsAria')}
         className="flex flex-wrap items-center gap-2"
       >
         {PRESETS.map((p) => {
           const isSelected = selectedId === p.id;
+          const label = t(`timer.presets.${p.id}` as PresetTranslationKey);
           return (
             <Button
               key={p.id}
               type="button"
               role="radio"
               aria-checked={isSelected}
-              aria-label={p.label}
+              aria-label={label}
               onClick={() => handlePresetClick(p.id)}
               variant={isSelected ? 'default' : 'outline'}
               size="sm"
               className="min-w-12"
             >
-              {p.label}
+              {label}
             </Button>
           );
         })}
@@ -140,12 +148,12 @@ export default function TimerControls() {
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-2">
             <Label htmlFor="custom-time" className="text-muted-foreground text-sm">
-              Custom (mm:ss)
+              {t('timer.customLabel')}
             </Label>
             <Input
               id="custom-time"
               type="text"
-              placeholder="4:30"
+              placeholder={t('timer.placeholder')}
               className="w-24 font-mono"
               value={
                 timeInput !== ''
@@ -155,7 +163,7 @@ export default function TimerControls() {
                     : ''
               }
               onChange={(e) => handleCustomChange(e.target.value)}
-              aria-label="Custom time in minutes and seconds"
+              aria-label={t('timer.customInputAria')}
               aria-invalid={validationError !== null}
               aria-describedby={validationError ? 'custom-time-error' : undefined}
             />
@@ -169,7 +177,9 @@ export default function TimerControls() {
       )}
 
       <span className="text-muted-foreground text-sm">
-        Total: <span className="font-medium">{totalSeconds}</span>s
+        {t('timer.summaryLabel')}{' '}
+        <span className="font-medium">{totalSeconds}</span>
+        {t('timer.summarySuffix')}
       </span>
     </section>
   );

@@ -3,6 +3,7 @@ import { ImageOff, X } from 'lucide-react';
 import type { ImageItem } from '@/types/core';
 import { Button } from '../ui/button';
 import { getPreviewURL, revokePreviewURL } from '@/utils/imagePreview';
+import { useTranslation } from '@/i18n/TranslationProvider';
 
 type ThumbProps = {
   img: ImageItem;
@@ -23,7 +24,8 @@ export const Thumb = React.memo(function Thumb({
   overlayAction,
   onBroken,
 }: ThumbProps) {
-  const label = img.name ?? 'Image';
+  const { t } = useTranslation();
+  const label = img.name ?? t('session.view.imageFallback');
   const [previewSrc, setPreviewSrc] = useState<string | null>(null);
 
   const [isBroken, setIsBroken] = useState(false);
@@ -79,7 +81,7 @@ export const Thumb = React.memo(function Thumb({
         <ImageOff className="text-destructive h-6 w-6" aria-hidden="true" />
 
         <p className="text-destructive line-clamp-1 px-2 text-xs font-medium">
-          Failed to load image
+          {t('images.thumb.failed')}
         </p>
 
         <p className="text-destructive/80 line-clamp-1 px-2 text-[11px]" title={label}>
@@ -95,7 +97,7 @@ export const Thumb = React.memo(function Thumb({
               className="h-7 px-2 text-xs"
               onClick={() => onRemove(img.id)}
             >
-              Remove
+              {t('images.thumb.remove')}
             </Button>
           )}
         </div>
@@ -127,7 +129,7 @@ export const Thumb = React.memo(function Thumb({
       {overlayLabel && overlayAction && (
         <button
           type="button"
-          aria-label={`${overlayLabel} – show all thumbnails`}
+          aria-label={t('images.thumb.overlayAction', { label: overlayLabel })}
           onClick={overlayAction}
           className="absolute inset-0 inline-flex items-center justify-center bg-black/45 text-white backdrop-blur-[1px] transition-colors hover:bg-black/55 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
         >
@@ -143,7 +145,7 @@ export const Thumb = React.memo(function Thumb({
           className="absolute top-2 right-2 rounded-full"
           type="button"
           onClick={() => onRemove(img.id)}
-          aria-label={`Remove ${label}`}
+          aria-label={t('images.thumb.removeAria', { label })}
           variant="outline"
           size="icon"
         >

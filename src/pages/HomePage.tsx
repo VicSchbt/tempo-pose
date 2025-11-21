@@ -7,15 +7,18 @@ import SessionControls from '@/components/session/SessionControls';
 import ImageGrid from '@/components/gallery/ImageGrid';
 import { Toaster } from 'sonner';
 import FirstTimeHelpDialog from '@/components/help/FirstTimeHelpDialog';
+import { useTranslation } from '@/i18n/TranslationProvider';
 
 export default function HomePage() {
+  const { t } = useTranslation();
+
   return (
     <div className="bg-background text-foreground flex min-h-svh flex-col">
       <Header />
       <Main>
         <section className="space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-semibold">Session</h2>
+            <h2 className="text-2xl font-semibold">{t('home.sessionHeading')}</h2>
           </div>
 
           <ImageDrop className="mt-6" />

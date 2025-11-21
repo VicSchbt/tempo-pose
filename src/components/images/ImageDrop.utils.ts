@@ -43,7 +43,6 @@ export function formatBytes(bytes: number) {
 export type FileValidationIssue = {
   file: File;
   reason: 'type' | 'size';
-  message: string;
 };
 
 /**
@@ -65,7 +64,6 @@ export function validateFiles(
       issues.push({
         file: f,
         reason: 'type',
-        message: `${f.name} is not a supported image type.`,
       });
       continue;
     }
@@ -73,7 +71,6 @@ export function validateFiles(
       issues.push({
         file: f,
         reason: 'size',
-        message: `${f.name} is too large (${formatBytes(f.size)}).`,
       });
       continue;
     }

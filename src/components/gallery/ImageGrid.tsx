@@ -7,6 +7,7 @@ import { useResponsiveColumns } from '@/hooks/useResponsiveColumns';
 import { ChevronUp } from 'lucide-react';
 import { CountBadge } from '../count-badge/CountBadge';
 import { useImagePrefetch } from '@/hooks/useImagePrefetch';
+import { useTranslation } from '@/i18n/TranslationProvider';
 
 /**
  * Collapsible first row:
@@ -42,6 +43,8 @@ export default function ImageGrid() {
 
   useImagePrefetch(toPrefetch, { concurrency: 2, limit: 10 });
 
+  const { t } = useTranslation();
+
   // Early return AFTER all hooks have been called
   if (!images || images.length === 0) {
     return (
@@ -50,7 +53,7 @@ export default function ImageGrid() {
         role="status"
         aria-live="polite"
       >
-        No images yet. Drop some files above to get started.
+        {t('gallery.empty')}
       </div>
     );
   }
@@ -59,12 +62,16 @@ export default function ImageGrid() {
     <section className="mx-auto mt-6 w-full max-w-5xl">
       <header className="mb-3 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
-          <h2 className="text-lg font-semibold text-foreground">Gallery</h2>
+          <h2 className="text-lg font-semibold text-foreground">{t('home.galleryHeading')}</h2>
           {/* Total images */}
           <CountBadge
             count={total}
-            ariaLabel={`Total images: ${total}`}
-            title={`${total} image${total > 1 ? 's' : ''}`}
+            ariaLabel={t('gallery.countAria', { count: total })}
+            title={
+              total === 1
+                ? t('gallery.countTitleSingle', { count: total })
+                : t('gallery.countTitlePlural', { count: total })
+            }
             variant="secondary"
           />
         </div>
@@ -72,16 +79,16 @@ export default function ImageGrid() {
         {typeof clearImages === 'function' && (
           <>
             <Button ref={clearBtnRef} variant="outline" onClick={() => setOpen(true)}>
-              Clear all
+              {t('gallery.clearAll')}
             </Button>
 
             <ConfirmDialog
               open={open}
               onOpenChange={setOpen}
-              title="Clear all images?"
-              description="This will permanently remove all thumbnails from the gallery."
-              confirmLabel="Yes, clear all"
-              cancelLabel="Cancel"
+              title={t('gallery.confirm.title')}
+              description={t('gallery.confirm.description')}
+              confirmLabel={t('gallery.confirm.confirm')}
+              cancelLabel={t('gallery.confirm.cancel')}
               tone="danger"
               onConfirm={() => clearImages()}
               returnFocus={() => clearBtnRef.current?.focus()}
@@ -97,12 +104,15 @@ export default function ImageGrid() {
         {visible.map((img, idx) => {
           const isLastVisibleAndCollapsed = !expanded && canCollapse && idx === visible.length - 1;
 
+          const overlayLabel = isLastVisibleAndCollapsed
+            ? t('gallery.moreOverlay', { count: remaining })
+            : undefined;
           return (
             <Thumb
               key={img.id}
               img={img}
               onRemove={typeof removeImage === 'function' ? removeImage : undefined}
-              overlayLabel={isLastVisibleAndCollapsed ? `+${remaining} more` : undefined}
+              overlayLabel={overlayLabel}
               overlayAction={isLastVisibleAndCollapsed ? () => setExpanded(true) : undefined}
               onBroken={(id) => markImageBroken(id)}
             />
@@ -116,11 +126,11 @@ export default function ImageGrid() {
             <Button
               variant="outline"
               onClick={() => setExpanded(false)}
-              aria-label="Hide extra thumbnails"
+              aria-label={t('gallery.hideAria')}
               className="flex h-full w-full flex-col items-center justify-center"
             >
               <ChevronUp />
-              <span className="text-sm font-medium">Hide</span>
+              <span className="text-sm font-medium">{t('gallery.hideLabel')}</span>
             </Button>
           </li>
         )}
