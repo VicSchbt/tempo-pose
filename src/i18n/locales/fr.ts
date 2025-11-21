@@ -82,8 +82,8 @@ const frTranslation = {
     countAria: 'Nombre total d’images : {{count}}',
     countTitleSingle: '{{count}} image',
     countTitlePlural: '{{count}} images',
-    moreOverlay: '+{{count}} supplémentaires',
-    hideAria: 'Masquer les vignettes supplémentaires',
+    moreOverlay: '+{{count}}\nvoir plus',
+    hideAria: 'voir moins',
     hideLabel: 'Masquer',
     clearAll: 'Tout effacer',
     confirm: {
@@ -118,6 +118,8 @@ const frTranslation = {
     help: {
       title: 'Guide de prise en main',
       description: 'Cinq conseils pour profiter immédiatement de Tempo Pose.',
+      keepScreenAwakeHint:
+        'Astuce : gardez l’écran actif pendant vos sessions pour ne pas interrompre le tempo.',
       steps: {
         pickPose: {
           title: 'Choisir une pose',

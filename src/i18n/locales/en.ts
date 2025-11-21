@@ -116,6 +116,8 @@ const enTranslation = {
     help: {
       title: 'Quick start guide',
       description: 'Five pointers to help you get the most out of Tempo Pose right away.',
+      keepScreenAwakeHint:
+        'Pro tip: keep your screen awake during sessions so your tempo never pauses.',
       steps: {
         pickPose: {
           title: 'Pick a pose',
