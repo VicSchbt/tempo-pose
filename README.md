@@ -172,10 +172,6 @@ For detailed documentation on specific features, see:
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## 📄 License
-
-[Add your license here]
-
 ---
 
 Made with ❤️ for pose practice enthusiasts
